@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 관리 시스템</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --danger: #f72585;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --pretty: #ff9ff3;
+            --sexy: #f368e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 20px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 500px;
+                padding: 30px;
+            }
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin: 20px 0 10px;
+            color: var(--dark);
+        }
+
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .tab.active:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 0 15px 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background-color: var(--white);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #d1145a;
+        }
+
+        .btn-pretty {
+            background-color: var(--pretty);
+        }
+
+        .btn-pretty:hover {
+            background-color: #ff7fdb;
+        }
+
+        .btn-sexy {
+            background-color: var(--sexy);
+        }
+
+        .btn-sexy:hover {
+            background-color: #e84393;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            width: auto;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            margin-top: 0;
+        }
+
+        .message {
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .success {
+            background-color: rgba(76, 201, 240, 0.2);
+            color: #0a9396;
+            border-left: 4px solid var(--success);
+        }
+
+        .error {
+            background-color: rgba(247, 37, 133, 0.2);
+            color: #9b2226;
+            border-left: 4px solid var(--danger);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.9rem;
+            min-width: 600px;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: var(--gray);
+            font-weight: 500;
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-primary {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .badge-success {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+
+        .badge-pretty {
+            background-color: rgba(255, 159, 243, 0.2);
+            color: var(--pretty);
+        }
+
+        .badge-sexy {
+            background-color: rgba(243, 104, 224, 0.2);
+            color: var(--sexy);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #e9ecef;
+        }
+
+        .empty-state p {
+            margin-top: 10px;
+        }
+
+        /* 모바일에서 더 나은 터치 경험을 위한 추가 스타일 */
+        input, button, .tab {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button {
+            user-select: none;
+        }
+
+        .referral-code {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 5px 0;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>회원 관리 시스템</h1>
+            </div>
+
+            <div class="tab-container">
+                <div class="tab active" onclick="openTab('login')">로그인</div>
+                <div class="tab" onclick="openTab('register')">회원가입</div>
+                <div class="tab" onclick="openTab('admin')">관리자</div>
+            </div>
+            
+            <!-- 로그인 탭 -->
+            <div id="login" class="tab-content active">
+                <h2>로그인</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUsername">아이디</label>
+                        <input type="text" id="loginUsername" placeholder="아이디를 입력하세요" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">비밀번호</label>
+                        <input type="password" id="loginPassword" placeholder="비밀번호를 입력하세요" required>
+                    </div>
+                    <button type="submit" class="btn">로그인</button>
+                </form>
+                <div id="loginMessage" class="message" style="display: none;"></div>
+            </div>
+            
+            <!-- 회원가입 탭 -->
+            <div id="register" class="tab-content">
+                <h2>회원가입</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="regUsername">아이디</label>
+                        <input type="text" id="regUsername" placeholder="아이디를 입력하세요" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">비밀번호</label>
+                        <input type="password" id="regPassword" placeholder="비밀번호를 입력하세요" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="referrer">추천인 코드</label>
+                        <input type="text" id="referrer" placeholder="추천인 코드를 입력하세요" required>
+                        <small style="color: var(--gray); font-size: 0.8rem;">유효한 추천인 코드를 입력해야 가입이 가능합니다</small>
+                    </div>
+                    <button type="submit" class="btn">회원가입</button>
+                </form>
+                <div id="registerMessage" class="message" style="display: none;"></div>
+            </div>
+            
+            <!-- 관리자 패널 탭 -->
+            <div id="admin" class="tab-content">
+                <h2>관리자 패널</h2>
+                <div id="adminMessage" class="message" style="display: none;"></div>
+                
+                <h3>추천인 코드 생성</h3>
+                <div class="btn-group">
+                    <button class="btn btn-pretty" onclick="generateReferralCode('pretty')">쁘띠유수 코드 생성</button>
+                    <button class="btn btn-sexy" onclick="generateReferralCode('sexy')">섹시유수 코드 생성</button>
+                </div>
+                
+                <h3>생성된 추천인 코드</h3>
+                <div class="table-responsive">
+                    <table id="codesTable">
+                        <thead>
+                            <tr>
+                                <th>코드</th>
+                                <th>유형</th>
+                                <th>생성일</th>
+                                <th>액션</th>
+                            </tr>
+                        </thead>
+                        <tbody id="codesList">
+                            <!-- 추천인 코드 목록이 여기에 동적으로 추가됩니다 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="codesEmptyState" class="empty-state" style="display: none;">
+                    <div>🔑</div>
+                    <h3>생성된 추천인 코드가 없습니다</h3>
+                    <p>위의 버튼을 눌러 새로운 추천인 코드를 생성해주세요</p>
+                </div>
+                
+                <h3>회원 목록</h3>
+                <div class="table-responsive">
+                    <table id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>아이디</th>
+                                <th>추천인</th>
+                                <th>가입일</th>
+                                <th>액션</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersList">
+                            <!-- 사용자 목록이 여기에 동적으로 추가됩니다 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="usersEmptyState" class="empty-state" style="display: none;">
+                    <div>📊</div>
+                    <h3>등록된 사용자가 없습니다</h3>
+                    <p>회원가입 탭에서 새로운 사용자를 추가해주세요</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 초기 데이터 로드
+        if (!localStorage.getItem('users')) {
+            localStorage.setItem('users', JSON.stringify([]));
+        }
+        
+        if (!localStorage.getItem('referralCodes')) {
+            localStorage.setItem('referralCodes', JSON.stringify([]));
+        }
+        
+        // 관리자 계정 설정
+        if (!localStorage.getItem('admin')) {
+            localStorage.setItem('admin', JSON.stringify({
+                username: 'admin',
+                password: 'admin123'
+            }));
+        }
+
+        // 탭 전환 함수
+        function openTab(tabName) {
+            const tabs = document.getElementsByClassName('tab');
+            const tabContents = document.getElementsByClassName('tab-content');
+            
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+                tabContents[i].classList.remove('active');
+            }
+            
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            // 관리자 패널 탭을 열 때 사용자 목록 새로고침
+            if (tabName === 'admin') {
+                loadUsers();
+                loadReferralCodes();
+            }
+        }
+
+        // 로그인 처리
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const message = document.getElementById('loginMessage');
+            
+            // 관리자 로그인 체크
+            const admin = JSON.parse(localStorage.getItem('admin'));
+            if (username === admin.username && password === admin.password) {
+                showMessage(message, '관리자로 로그인되었습니다.', 'success');
+                openTab('admin');
+                return;
+            }
+            
+            // 일반 사용자 로그인 체크
+            const users = JSON.parse(localStorage.getItem('users'));
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                showMessage(message, `${username}님, 환영합니다!`, 'success');
+            } else {
+                showMessage(message, '아이디 또는 비밀번호가 잘못되었습니다.', 'error');
+            }
+        });
+
+        // 회원가입 처리
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const referralCode = document.getElementById('referrer').value;
+            const message = document.getElementById('registerMessage');
+            
+            // 아이디 유효성 검사
+            if (username.length < 4) {
+                showMessage(message, '아이디는 4자 이상이어야 합니다.', 'error');
+                return;
+            }
+            
+            // 비밀번호 유효성 검사
+            if (password.length < 6) {
+                showMessage(message, '비밀번호는 6자 이상이어야 합니다.', 'error');
+                return;
+            }
+            
+            // 아이디 중복 체크
+            const users = JSON.parse(localStorage.getItem('users'));
+            const existingUser = users.find(u => u.username === username);
+            
+            if (existingUser) {
+                showMessage(message, '이미 사용 중인 아이디입니다. 다른 아이디를 선택해주세요.', 'error');
+                return;
+            }
+            
+            // 추천인 코드 유효성 검사
+            const referralCodes = JSON.parse(localStorage.getItem('referralCodes'));
+            const validCode = referralCodes.find(code => code.code === referralCode);
+            
+            if (!validCode) {
+                showMessage(message, '유효하지 않은 추천인 코드입니다. 올바른 코드를 입력해주세요.', 'error');
+                return;
+            }
+            
+            // 새 사용자 추가
+            const newUser = {
+                username: username,
+                password: password,
+                referrer: referralCode,
+                joinDate: new Date().toISOString()
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showMessage(message, '회원가입이 완료되었습니다! 로그인 탭에서 로그인해주세요.', 'success');
+            document.getElementById('registerForm').reset();
+        });
+
+        // 사용자 목록 로드
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem('users'));
+            const usersList = document.getElementById('usersList');
+            const emptyState = document.getElementById('usersEmptyState');
+            usersList.innerHTML = '';
+            
+            if (users.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                
+                // 가입일 포맷팅
+                const joinDate = new Date(user.joinDate);
+                const formattedDate = `${joinDate.getFullYear()}-${(joinDate.getMonth()+1).toString().padStart(2, '0')}-${joinDate.getDate().toString().padStart(2, '0')} ${joinDate.getHours().toString().padStart(2, '0')}:${joinDate.getMinutes().toString().padStart(2, '0')}`;
+                
+                // 추천인 코드 유형 확인
+                const referralCodes = JSON.parse(localStorage.getItem('referralCodes'));
+                const codeInfo = referralCodes.find(code => code.code === user.referrer);
+                let badgeClass = 'badge-primary';
+                
+                if (codeInfo) {
+                    if (codeInfo.type === 'pretty') badgeClass = 'badge-pretty';
+                    else if (codeInfo.type === 'sexy') badgeClass = 'badge-sexy';
+                }
+                
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td><span class="badge ${badgeClass}">${user.referrer}</span></td>
+                    <td>${formattedDate}</td>
+                    <td><button class="btn btn-danger btn-sm" onclick="deleteUser('${user.username}')">삭제</button></td>
+                `;
+                usersList.appendChild(row);
+            });
+        }
+
+        // 추천인 코드 목록 로드
+        function loadReferralCodes() {
+            const codes = JSON.parse(localStorage.getItem('referralCodes'));
+            const codesList = document.getElementById('codesList');
+            const emptyState = document.getElementById('codesEmptyState');
+            codesList.innerHTML = '';
+            
+            if (codes.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            codes.forEach(code => {
+                const row = document.createElement('tr');
+                
+                // 생성일 포맷팅
+                const createdDate = new Date(code.createdAt);
+                const formattedDate = `${createdDate.getFullYear()}-${(createdDate.getMonth()+1).toString().padStart(2, '0')}-${createdDate.getDate().toString().padStart(2, '0')}`;
+                
+                // 유형에 따른 배지 클래스
+                let badgeClass = 'badge-primary';
+                let typeText = '일반';
+                
+                if (code.type === 'pretty') {
+                    badgeClass = 'badge-pretty';
+                    typeText = '쁘띠유수';
+                } else if (code.type === 'sexy') {
+                    badgeClass = 'badge-sexy';
+                    typeText = '섹시유수';
+                }
+                
+                row.innerHTML = `
+                    <td><span class="referral-code">${code.code}</span></td>
+                    <td><span class="badge ${badgeClass}">${typeText}</span></td>
+                    <td>${formattedDate}</td>
+                    <td><button class="btn btn-danger btn-sm" onclick="deleteReferralCode('${code.code}')">삭제</button></td>
+                `;
+                codesList.appendChild(row);
+            });
+        }
+
+        // 추천인 코드 생성 (쁘띠유수/섹시유수)
+        function generateReferralCode(type) {
+            const prefix = type === 'pretty' ? 'PTY-' : 'SXY-';
+            const code = prefix + Math.random().toString(36).substring(2, 8).toUpperCase();
+            
+            const referralCodes = JSON.parse(localStorage.getItem('referralCodes'));
+            
+            const newCode = {
+                code: code,
+                type: type,
+                createdAt: new Date().toISOString()
+            };
+            
+            referralCodes.push(newCode);
+            localStorage.setItem('referralCodes', JSON.stringify(referralCodes));
+            
+            showMessage(document.getElementById('adminMessage'), 
+                      `${type === 'pretty' ? '쁘띠유수' : '섹시유수'} 추천인 코드가 생성되었습니다: ${code}`, 
+                      'success');
+            loadReferralCodes();
+        }
+
+        // 사용자 삭제
+        function deleteUser(username) {
+            if (username === 'admin') {
+                showMessage(document.getElementById('adminMessage'), '관리자 계정은 삭제할 수 없습니다.', 'error');
+                return;
+            }
+            
+            if (!confirm(`정말로 ${username} 사용자를 삭제하시겠습니까?`)) {
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users'));
+            const filteredUsers = users.filter(u => u.username !== username);
+            
+            localStorage.setItem('users', JSON.stringify(filteredUsers));
+            loadUsers();
+            showMessage(document.getElementById('adminMessage'), `사용자 ${username}이(가) 삭제되었습니다.`, 'success');
+        }
+
+        // 추천인 코드 삭제
+        function deleteReferralCode(code) {
+            if (!confirm(`정말로 추천인 코드 ${code}을(를) 삭제하시겠습니까?`)) {
+                return;
+            }
+            
+            const referralCodes = JSON.parse(localStorage.getItem('referralCodes'));
+            const filteredCodes = referralCodes.filter(c => c.code !== code);
+            
+            localStorage.setItem('referralCodes', JSON.stringify(filteredCodes));
+            loadReferralCodes();
+            showMessage(document.getElementById('adminMessage'), `추천인 코드 ${code}이(가) 삭제되었습니다.`, 'success');
+        }
+
+        // 메시지 표시
+        function showMessage(element, text, type) {
+            element.textContent = text;
+            element.className = `message ${type}`;
+            element.style.display = 'block';
+            
+            // 입력 필드 초기화
+            if (type === 'success') {
+                document.getElementById('loginForm').reset();
+            }
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // 페이지 로드 시 초기화
+        window.onload = function() {
+            loadUsers();
+            loadReferralCodes();
+            
+            // 모바일에서 더 나은 UX를 위해 입력 필드 자동 포커스 방지
+            if (window.innerWidth <= 768) {
+                document.addEventListener('touchstart', function() {}, true);
+            }
+        };
+    </script>
+</body>
+</html>
