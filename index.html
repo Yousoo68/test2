@@ -3,125 +3,450 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tesstrw</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js"></script>
-</head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-md bg-white shadow-lg rounded-lg p-6" id="authFormContainer">
-        <h2 class="text-2xl font-bold text-center text-gray-700 mb-4">회원가입</h2>
-        <form id="signupForm" class="space-y-4">
-            <input type="email" id="signupEmail" placeholder="이메일" required class="w-full px-4 py-2 border rounded-md">
-            <input type="password" id="signupPassword" placeholder="비밀번호 (8자 이상)" required class="w-full px-4 py-2 border rounded-md">
-            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">회원가입</button>
-        </form>
-
-        <h2 class="text-2xl font-bold text-center text-gray-700 mt-6">로그인</h2>
-        <form id="loginForm" class="space-y-4">
-            <input type="email" id="loginEmail" placeholder="이메일" required class="w-full px-4 py-2 border rounded-md">
-            <input type="password" id="loginPassword" placeholder="비밀번호" required class="w-full px-4 py-2 border rounded-md">
-            <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">로그인</button>
-        </form>
-
-        <button id="resetPasswordBtn" class="w-full bg-gray-500 text-white py-2 rounded-md hover:bg-gray-600 transition mt-4">비밀번호 재설정</button>
+    <title>회원가입 및 로그인</title>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --error-color: #ff3333;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
         
-        <!-- 성공/실패 메시지 표시 -->
-        <p id="message" class="text-center text-red-500 mt-4"></p>
-    </div>
-
-    <div id="welcomeMessage" class="hidden text-center text-4xl font-bold text-green-500">
-        안녕
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .auth-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 1.2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            color: #666;
+            background: #f1f1f1;
+        }
+        
+        .tab:first-child {
+            border-top-left-radius: var(--border-radius);
+        }
+        
+        .tab:last-child {
+            border-top-right-radius: var(--border-radius);
+        }
+        
+        .tab.active {
+            background: white;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .tab-content {
+            padding: 2rem;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .message {
+            padding: 0.8rem 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .message.success {
+            background-color: rgba(75, 181, 67, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(75, 181, 67, 0.3);
+        }
+        
+        .message.error {
+            background-color: rgba(255, 51, 51, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(255, 51, 51, 0.3);
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .remember-me input {
+            margin-right: 0.5rem;
+        }
+        
+        .password-strength {
+            height: 4px;
+            background: #eee;
+            margin-top: 0.5rem;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--error-color);
+            transition: var(--transition);
+        }
+        
+        .password-hint {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .tab {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .tab-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="auth-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="login">로그인</div>
+                <div class="tab" data-tab="signup">회원가입</div>
+            </div>
+            
+            <div class="tab-content">
+                <!-- 로그인 탭 -->
+                <div id="login" class="tab-pane active">
+                    <div id="login-message" class="message hidden"></div>
+                    
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="login-id">아이디</label>
+                            <input type="text" id="login-id" class="form-control" placeholder="아이디를 입력하세요" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="login-password">비밀번호</label>
+                            <input type="password" id="login-password" class="form-control" placeholder="비밀번호를 입력하세요" required>
+                        </div>
+                        
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember-id" checked>
+                            <label for="remember-id">아이디 저장</label>
+                        </div>
+                        
+                        <button type="submit" class="btn">로그인</button>
+                    </form>
+                </div>
+                
+                <!-- 회원가입 탭 -->
+                <div id="signup" class="tab-pane">
+                    <div id="signup-message" class="message hidden"></div>
+                    
+                    <form id="signup-form">
+                        <div class="form-group">
+                            <label for="signup-id">아이디 (영문만 가능)</label>
+                            <input type="text" id="signup-id" class="form-control" placeholder="영문 아이디를 입력하세요" pattern="[A-Za-z]+" title="영문만 입력해주세요" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="signup-password">비밀번호 (8자 이상)</label>
+                            <input type="password" id="signup-password" class="form-control" placeholder="8자 이상 비밀번호를 입력하세요" minlength="8" required>
+                            <div class="password-strength">
+                                <div class="strength-bar" id="password-strength-bar"></div>
+                            </div>
+                            <div class="password-hint">비밀번호는 8자 이상이어야 합니다.</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="referral-code">추천인 코드</label>
+                            <input type="text" id="referral-code" class="form-control" placeholder="추천인 코드를 입력하세요" required>
+                        </div>
+                        
+                        <button type="submit" class="btn">회원가입</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // ✅ Firebase 초기화
-        const firebaseConfig = {
-            apiKey: "AIzaSyBdzMBmsEGCETm3Tf7N-op5ANgsydjkMWc",
-            authDomain: "login-ddb0a.firebaseapp.com",
-            projectId: "login-ddb0a",
-            storageBucket: "login-ddb0a.firebasestorage.app",
-            messagingSenderId: "722735085241",
-            appId: "1:722735085241:web:9dde97154af644a4c1cd68",
-            measurementId: "G-4B9B610VMH"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-
-        // ✅ 회원가입 기능
-        document.getElementById("signupForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            const email = document.getElementById("signupEmail").value;
-            const password = document.getElementById("signupPassword").value;
-
-            auth.createUserWithEmailAndPassword(email, password)
-                .then(() => {
-                    document.getElementById("message").textContent = "회원가입 성공!";
-                    document.getElementById("message").classList.remove("text-red-500");
-                    document.getElementById("message").classList.add("text-green-500");
-                })
-                .catch(error => {
-                    document.getElementById("message").textContent = "회원가입 실패: " + error.message;
-                    document.getElementById("message").classList.remove("text-green-500");
-                    document.getElementById("message").classList.add("text-red-500");
-                });
+        // 탭 전환 기능
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 모든 탭 비활성화
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                
+                // 현재 탭 활성화
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
         });
 
-        // ✅ 로그인 기능
-        document.getElementById("loginForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            const email = document.getElementById("loginEmail").value;
-            const password = document.getElementById("loginPassword").value;
-
-            auth.signInWithEmailAndPassword(email, password)
-                .then(() => {
-                    // 로그인 성공 후 화면 변경
-                    document.getElementById("authFormContainer").classList.add("hidden");
-                    document.getElementById("welcomeMessage").classList.remove("hidden");
-
-                    // 성공 문구
-                    document.getElementById("message").textContent = "로그인 성공!";
-                    document.getElementById("message").classList.remove("text-red-500");
-                    document.getElementById("message").classList.add("text-green-500");
-                })
-                .catch(error => {
-                    document.getElementById("message").textContent = "로그인 실패: " + error.message;
-                    document.getElementById("message").classList.remove("text-green-500");
-                    document.getElementById("message").classList.add("text-red-500");
+        // 페이지 로드 시 저장된 아이디가 있으면 표시
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedId = localStorage.getItem('savedUserId');
+            if (savedId) {
+                document.getElementById('login-id').value = savedId;
+                document.getElementById('remember-id').checked = true;
+            }
+            
+            // 비밀번호 강도 표시
+            const passwordInput = document.getElementById('signup-password');
+            const strengthBar = document.getElementById('password-strength-bar');
+            
+            if (passwordInput && strengthBar) {
+                passwordInput.addEventListener('input', function() {
+                    const strength = calculatePasswordStrength(this.value);
+                    strengthBar.style.width = strength + '%';
+                    
+                    if (strength < 30) {
+                        strengthBar.style.backgroundColor = 'var(--error-color)';
+                    } else if (strength < 70) {
+                        strengthBar.style.backgroundColor = '#ffa500';
+                    } else {
+                        strengthBar.style.backgroundColor = 'var(--success-color)';
+                    }
                 });
-        });
-
-        // ✅ 비밀번호 재설정 기능
-        document.getElementById("resetPasswordBtn").addEventListener("click", function() {
-            const email = prompt("비밀번호 재설정 링크를 받을 이메일을 입력하세요:");
-            if (email) {
-                auth.sendPasswordResetEmail(email)
-                    .then(() => alert("비밀번호 재설정 메일을 보냈습니다."))
-                    .catch(error => alert("오류 발생: " + error.message));
             }
         });
+        
+        function calculatePasswordStrength(password) {
+            let strength = 0;
+            
+            // 길이 검사
+            strength += Math.min(password.length * 5, 50);
+            
+            // 문자 다양성 검사
+            if (/[A-Z]/.test(password)) strength += 10;
+            if (/[0-9]/.test(password)) strength += 10;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 10;
+            
+            return Math.min(strength, 100);
+        }
 
+        // 회원가입 처리
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('signup-id').value;
+            const password = document.getElementById('signup-password').value;
+            const referralCode = document.getElementById('referral-code').value;
+            const messageDiv = document.getElementById('signup-message');
+            
+            // 추천인 코드 검증
+            if (referralCode !== '2028317') {
+                messageDiv.textContent = '유효하지 않은 추천인 코드입니다. 허용된 코드: 2028317';
+                messageDiv.className = 'message error';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+            
+            // 비밀번호 길이 검증
+            if (password.length < 8) {
+                messageDiv.textContent = '비밀번호는 8자 이상이어야 합니다.';
+                messageDiv.className = 'message error';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+            
+            // 아이디 영문 검증
+            if (!/^[A-Za-z]+$/.test(id)) {
+                messageDiv.textContent = '아이디는 영문만 사용 가능합니다.';
+                messageDiv.className = 'message error';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+            
+            // 사용자 정보 저장 (실제로는 서버에 전송해야 함)
+            localStorage.setItem('user_' + id, JSON.stringify({
+                id: id,
+                password: password // 실제 애플리케이션에서는 절대 이렇게 저장하지 마세요! 해시 처리 필요
+            }));
+            
+            messageDiv.textContent = '회원가입이 완료되었습니다! 이제 로그인할 수 있습니다.';
+            messageDiv.className = 'message success';
+            messageDiv.classList.remove('hidden');
+            
+            // 회원가입 후 로그인 탭으로 전환
+            document.querySelector('.tab[data-tab="login"]').click();
+            
+            // 폼 초기화
+            this.reset();
+            document.getElementById('password-strength-bar').style.width = '0%';
+        });
+
+        // 로그인 처리
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('login-id').value;
+            const password = document.getElementById('login-password').value;
+            const rememberMe = document.getElementById('remember-id').checked;
+            const messageDiv = document.getElementById('login-message');
+            
+            // 저장된 사용자 정보 가져오기
+            const userData = JSON.parse(localStorage.getItem('user_' + id));
+            
+            if (!userData) {
+                messageDiv.textContent = '존재하지 않는 아이디입니다.';
+                messageDiv.className = 'message error';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+            
+            if (userData.password !== password) {
+                messageDiv.textContent = '비밀번호가 일치하지 않습니다.';
+                messageDiv.className = 'message error';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+            
+            // 로그인 성공 - 아이디 저장
+            if (rememberMe) {
+                localStorage.setItem('savedUserId', id);
+            } else {
+                localStorage.removeItem('savedUserId');
+            }
+            
+            messageDiv.textContent = '로그인 성공! 환영합니다, ' + id + '님!';
+            messageDiv.className = 'message success';
+            messageDiv.classList.remove('hidden');
+            
+            // 2초 후 리디렉션 (예시)
+            setTimeout(() => {
+                // window.location.href = '/dashboard.html'; // 실제로는 대시보드 페이지로 이동
+            }, 2000);
+        });
     </script>
 
-    <!-- ✅ Firebase 최신 SDK 추가 -->
+    <!-- Firebase SDK 추가 -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBdzMBmsEGCETm3Tf7N-op5ANgsydjkMWc",
-            authDomain: "login-ddb0a.firebaseapp.com",
-            projectId: "login-ddb0a",
-            storageBucket: "login-ddb0a.firebasestorage.app",
-            messagingSenderId: "722735085241",
-            appId: "1:722735085241:web:9dde97154af644a4c1cd68",
-            measurementId: "G-4B9B610VMH"
-        };
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      const firebaseConfig = {
+        apiKey: "AIzaSyBdzMBmsEGCETm3Tf7N-op5ANgsydjkMWc",
+        authDomain: "login-ddb0a.firebaseapp.com",
+        projectId: "login-ddb0a",
+        storageBucket: "login-ddb0a.firebasestorage.app",
+        messagingSenderId: "722735085241",
+        appId: "1:722735085241:web:9dde97154af644a4c1cd68",
+        measurementId: "G-4B9B610VMH"
+      };
 
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
     </script>
-
 </body>
 </html>
