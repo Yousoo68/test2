@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입 및 로그인</title>
+    <title>섹시유수 갤러리</title>
     <style>
+        /* 로그인 시스템 스타일 */
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3f37c9;
@@ -192,6 +193,87 @@
             margin-top: 0.3rem;
         }
         
+        /* 갤러리 콘텐츠 스타일 */
+        .content {
+            display: none;
+            text-align: center;
+            width: 90%;
+        }
+
+        .gallery-title {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .button-container {
+            margin-top: 40px;
+        }
+
+        .gallery-btn {
+            font-size: 17pt;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px;
+            margin: 40px 0;
+            width: fit-content;
+            cursor: pointer;
+            background: none;
+            border: none;
+            text-decoration: none;
+        }
+
+        .gallery-btn.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .gallery-btn img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .reader-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 40px;
+        }
+
+        .reader-container img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .reader-container p {
+            margin: 0;
+            font-size: 17pt;
+        }
+
+        .vault-link {
+            pointer-events: none;
+            display: block;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .vault-link img {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+        }
+
+        .vault-small {
+            display: block;
+            margin: 10px auto;
+            width: 100%;
+            height: auto;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -209,6 +291,7 @@
     </style>
 </head>
 <body>
+    <!-- 로그인 시스템 -->
     <div class="container">
         <div class="auth-container">
             <div class="tabs">
@@ -270,6 +353,55 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- 갤러리 콘텐츠 (로그인해야 보임) -->
+    <div class="content" id="content">
+        <img class="gallery-title" src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Gallery.png" alt="섹시유수 갤러리">
+
+        <!-- 독자 목록 및 ReaderList 이미지 -->
+        <div class="reader-container">
+            <img src="https://raw.githubusercontent.com/Yousoo68/H2JhFqK/refs/heads/main/ReaderList.png" alt="ReaderList">
+            <a href="https://yousoo68.github.io/jh6RTBZ/" style="text-decoration: none; color: black;">
+                <p>쁘띠/섹시유수 독자 목록</p>
+            </a>
+        </div>
+
+        <div class="button-container">
+            <a class="gallery-btn disabled" id="diary" href="https://www.instagram.com/sexyyousoo/?__pwa=1">
+                <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Insta.jpg" alt="diary">
+                섹시유수의 비밀 일기
+            </a>
+            <a class="gallery-btn disabled" id="note" href="https://m.youtube.com/playlist?list=PLxefOlZhxI_1s42VUk1SMJpYwJKC4MK68">
+                <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Note.jpg" alt="note">
+                인생노트
+            </a>
+            <a class="gallery-btn disabled" id="ssul" href="https://yousoo68.github.io/SSUL/">
+                <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/SSUL.jpg" alt="ssul">
+                섹시유수의 비밀 썰
+            </a>
+            <a class="gallery-btn disabled" id="cuttoon" href="https://docs.google.com/document/u/0/d/1zFtfcSMpRMK2dg-sx1D2ladmQ3DV14aKxHfytMfRT2E/mobilebasic?fbclid=PAY2xjawIstlVleHRuA2FlbQIxMAABpsVKLg0NY2Dh3E96VC1f1BAmDoc9Si-Aurz6GEjHyAFHibcxV_HYi4Da1A_aem_6QJoWJi3HKdSITYRU8OtVQ&pli=1">
+                <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/CutToon.jpg" alt="cuttoon">
+                섹시유수 컷툰
+            </a>
+
+            <a class="gallery-btn disabled" id="travel" href="https://yousoo68.github.io/H2JhFqK/" style="margin-top: 40px;">
+                <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Travel.jpg" alt="travel">
+                섹시유수의 여행일지
+            </a>
+
+            <a class="gallery-btn disabled" id="diy" href="https://m.youtube.com/playlist?list=PLxefOlZhxI_3HEZdLOfsV5hoLLUdz2Cbg" style="display: none;">
+                <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/DIY.jpg" alt="diy">
+                DIY오나홀
+            </a>
+        </div>
+
+        <!-- vault 이미지 -->
+        <a class="vault-link disabled" id="vault">
+            <img src="https://raw.githubusercontent.com/Yousoo68/photo/refs/heads/main/blank.jpg" alt="blank">
+        </a>
+        <!-- Vault.jpg 이미지 (작은 크기로 배치) -->
+        <img class="vault-small" src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Vault.jpg" alt="vault-small">
     </div>
 
     <script>
@@ -359,7 +491,16 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 console.log('사용자 로그인 상태:', user.email);
-                // 필요한 경우 여기서 UI 업데이트
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+                // 추천인에 따라 접근 가능한 항목 설정
+                // 여기서는 임시로 모든 버튼 활성화 (실제로는 Firebase에서 추천인 정보 가져와야 함)
+                document.querySelectorAll('.gallery-btn').forEach(btn => {
+                    btn.classList.remove('disabled');
+                });
+                document.getElementById('vault').classList.remove('disabled');
+                document.getElementById('diy').style.display = 'flex';
             } else {
                 console.log('사용자 로그아웃 상태');
             }
@@ -374,8 +515,8 @@
             const messageDiv = document.getElementById('signup-message');
             
             // 유효성 검사
-            if (referralCode !== '2028317', '6389') {
-                messageDiv.textContent = '유효하지 않은 추천인 코드입니다.';
+            if (referralCode !== '2028317' && referralCode !== '6389') {
+                messageDiv.textContent = '유효하지 않은 추천인 코드입니다. 허용된 코드: 2028317 또는 6389';
                 messageDiv.className = 'message error';
                 messageDiv.classList.remove('hidden');
                 return;
