@@ -274,6 +274,11 @@
             height: auto;
         }
 
+        /* 추가된 스타일 */
+        .hidden {
+            display: none !important;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -292,7 +297,7 @@
 </head>
 <body>
     <!-- 로그인 시스템 -->
-    <div class="container">
+    <div class="container" id="authSection">
         <div class="auth-container">
             <div class="tabs">
                 <div class="tab active" data-tab="login">로그인</div>
@@ -356,7 +361,7 @@
     </div>
 
     <!-- 갤러리 콘텐츠 (로그인해야 보임) -->
-    <div class="content" id="content">
+    <div class="content hidden" id="content">
         <img class="gallery-title" src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Gallery.png" alt="섹시유수 갤러리">
 
         <!-- 독자 목록 및 ReaderList 이미지 -->
@@ -489,10 +494,14 @@
 
         // 인증 상태 관찰자 (크로스 디바이스 로그인 지원)
         onAuthStateChanged(auth, (user) => {
+            const authSection = document.getElementById('authSection');
+            const contentSection = document.getElementById('content');
+            
             if (user) {
                 console.log('사용자 로그인 상태:', user.email);
-                document.getElementById('authSection').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
+                // 로그인 상태: 인증 섹션 숨기고 콘텐츠 표시
+                authSection.classList.add('hidden');
+                contentSection.classList.remove('hidden');
                 
                 // 추천인에 따라 접근 가능한 항목 설정
                 // 여기서는 임시로 모든 버튼 활성화 (실제로는 Firebase에서 추천인 정보 가져와야 함)
@@ -503,6 +512,9 @@
                 document.getElementById('diy').style.display = 'flex';
             } else {
                 console.log('사용자 로그아웃 상태');
+                // 로그아웃 상태: 인증 섹션 표시하고 콘텐츠 숨기기
+                authSection.classList.remove('hidden');
+                contentSection.classList.add('hidden');
             }
         });
 
@@ -595,11 +607,6 @@
                 messageDiv.textContent = '로그인 성공! 환영합니다, ' + username + '님!';
                 messageDiv.className = 'message success';
                 messageDiv.classList.remove('hidden');
-                
-                // 2초 후 리디렉션 (실제 사용시 주석 해제)
-                setTimeout(() => {
-                    // window.location.href = '/dashboard.html';
-                }, 2000);
             } catch (error) {
                 let errorMessage = '로그인 실패: ';
                 switch(error.code) {
