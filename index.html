@@ -25,6 +25,9 @@
         </form>
 
         <button id="resetPasswordBtn" class="w-full bg-gray-500 text-white py-2 rounded-md hover:bg-gray-600 transition mt-4">비밀번호 재설정</button>
+        
+        <!-- 성공/실패 메시지 표시 -->
+        <p id="message" class="text-center text-red-500 mt-4"></p>
     </div>
 
     <div id="welcomeMessage" class="hidden text-center text-4xl font-bold text-green-500">
@@ -76,6 +79,11 @@
                     // 로그인 성공 후 화면 변경
                     document.getElementById("authFormContainer").classList.add("hidden");
                     document.getElementById("welcomeMessage").classList.remove("hidden");
+
+                    // 성공 문구
+                    document.getElementById("message").textContent = "로그인 성공!";
+                    document.getElementById("message").classList.remove("text-red-500");
+                    document.getElementById("message").classList.add("text-green-500");
                 })
                 .catch(error => {
                     document.getElementById("message").textContent = "로그인 실패: " + error.message;
