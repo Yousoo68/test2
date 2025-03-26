@@ -159,9 +159,11 @@
         .logo {
             text-align: center;
             margin-bottom: 1.5rem;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary-color);
+        }
+        
+        .logo img {
+            max-width: 180px;
+            height: auto;
         }
         
         @media (max-width: 480px) {
@@ -173,13 +175,19 @@
             h1 {
                 font-size: 1.5rem;
             }
+            
+            .logo img {
+                max-width: 150px;
+            }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <div class="logo">LOGO</div>
+        <div class="logo">
+            <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Gallery.png" alt="사이트 로고">
+        </div>
         
         <!-- 로그인 폼 -->
         <div id="login-form">
