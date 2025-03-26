@@ -3,508 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>이메일 인증 시스템</title>
-    <style>
-        :root {
-            --primary-color: #4361ee;
-            --primary-hover: #3a56d4;
-            --secondary-color: #7209b7;
-            --error-color: #f72585;
-            --success-color: #4cc9f0;
-            --text-color: #2b2d42;
-            --light-gray: #f8f9fa;
-            --border-color: #dee2e6;
-        }
-        
-        body {
-            font-family: 'Noto Sans KR', '맑은 고딕', sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--text-color);
-        }
-        
-        .container {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            width: 100%;
-            max-width: 420px;
-            transition: all 0.3s ease;
-        }
-        
-        h1 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-            font-weight: 700;
-            font-size: 1.8rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text-color);
-            font-size: 0.9rem;
-        }
-        
-        input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            box-sizing: border-box;
-            transition: border 0.3s;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-        }
-        
-        button {
-            width: 100%;
-            padding: 0.85rem;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 0.5rem;
-        }
-        
-        button:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .error {
-            color: var(--error-color);
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-            font-weight: 400;
-        }
-        
-        .success {
-            color: var(--success-color);
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-            font-weight: 500;
-        }
-        
-        .form-switch {
-            text-align: center;
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        
-        .form-switch a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-            cursor: pointer;
-            margin: 0 0.25rem;
-        }
-        
-        .form-switch a:hover {
-            text-decoration: underline;
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 1.5rem 0;
-            color: #adb5bd;
-            font-size: 0.85rem;
-        }
-        
-        .divider::before, .divider::after {
-            content: "";
-            flex: 1;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .divider::before {
-            margin-right: 0.75rem;
-        }
-        
-        .divider::after {
-            margin-left: 0.75rem;
-        }
-        
-        .logo {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .logo img {
-            max-width: 180px;
-            height: auto;
-        }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 1.5rem;
-                margin: 0 1rem;
-            }
-            
-            h1 {
-                font-size: 1.5rem;
-            }
-            
-            .logo img {
-                max-width: 150px;
-            }
-        }
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>Firebase 회원가입 & 로그인</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js"></script>
 </head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Gallery.png" alt="사이트 로고">
-        </div>
-        
-        <!-- 로그인 폼 -->
-        <div id="login-form">
-            <h1>로그인</h1>
-            <div class="form-group">
-                <label for="login-username">아이디</label>
-                <input type="text" id="login-username" placeholder="아이디를 입력하세요">
-            </div>
-            <div class="form-group">
-                <label for="login-password">비밀번호</label>
-                <input type="password" id="login-password" placeholder="비밀번호를 입력하세요">
-            </div>
-            <div id="login-error" class="error hidden"></div>
-            <button id="login-btn">로그인</button>
-            
-            <div class="divider">또는</div>
-            
-            <div class="form-switch">
-                <span>계정이 없으신가요?</span>
-                <a id="show-register">회원가입</a>
-                <span>|</span>
-                <a id="show-forgot">비밀번호 찾기</a>
-            </div>
-        </div>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-md bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-center text-gray-700 mb-4">회원가입</h2>
+        <form id="signupForm" class="space-y-4">
+            <input type="email" id="signupEmail" placeholder="이메일" required class="w-full px-4 py-2 border rounded-md">
+            <input type="password" id="signupPassword" placeholder="비밀번호 (8자 이상)" required class="w-full px-4 py-2 border rounded-md">
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">회원가입</button>
+        </form>
 
-        <!-- 회원가입 폼 -->
-        <div id="register-form" class="hidden">
-            <h1>회원가입</h1>
-            <div class="form-group">
-                <label for="reg-email">이메일 주소</label>
-                <input type="email" id="reg-email" placeholder="이메일을 입력하세요">
-            </div>
-            <button id="send-verification-btn">인증코드 전송</button>
-            <div id="email-sent-msg" class="success hidden">인증코드가 이메일로 발송되었습니다!</div>
-            
-            <div id="verification-section" class="hidden">
-                <div class="form-group">
-                    <label for="verification-code">인증코드</label>
-                    <input type="text" id="verification-code" placeholder="인증코드 6자리를 입력하세요">
-                </div>
-                <div class="form-group">
-                    <label for="reg-username">아이디 (영문만 가능)</label>
-                    <input type="text" id="reg-username" placeholder="영문 아이디를 입력하세요">
-                </div>
-                <div class="form-group">
-                    <label for="reg-password">비밀번호 (8자 이상)</label>
-                    <input type="password" id="reg-password" placeholder="8자 이상의 비밀번호를 입력하세요">
-                </div>
-                <div class="form-group">
-                    <label for="reg-confirm-password">비밀번호 확인</label>
-                    <input type="password" id="reg-confirm-password" placeholder="비밀번호를 다시 입력하세요">
-                </div>
-                <div id="register-error" class="error hidden"></div>
-                <button id="register-btn">회원가입 완료</button>
-                
-                <div class="form-switch">
-                    <span>이미 계정이 있으신가요?</span>
-                    <a id="show-login-from-register">로그인</a>
-                </div>
-            </div>
-        </div>
+        <h2 class="text-2xl font-bold text-center text-gray-700 mt-6">로그인</h2>
+        <form id="loginForm" class="space-y-4">
+            <input type="email" id="loginEmail" placeholder="이메일" required class="w-full px-4 py-2 border rounded-md">
+            <input type="password" id="loginPassword" placeholder="비밀번호" required class="w-full px-4 py-2 border rounded-md">
+            <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">로그인</button>
+        </form>
 
-        <!-- 비밀번호 찾기 폼 -->
-        <div id="forgot-form" class="hidden">
-            <h1>비밀번호 재설정</h1>
-            <div class="form-group">
-                <label for="forgot-email">가입한 이메일 주소</label>
-                <input type="email" id="forgot-email" placeholder="가입시 사용한 이메일을 입력하세요">
-            </div>
-            <button id="send-reset-code-btn">재설정 코드 전송</button>
-            <div id="reset-code-sent-msg" class="success hidden">재설정 코드가 이메일로 발송되었습니다!</div>
-            
-            <div id="reset-section" class="hidden">
-                <div class="form-group">
-                    <label for="reset-code">재설정 코드</label>
-                    <input type="text" id="reset-code" placeholder="이메일로 받은 코드를 입력하세요">
-                </div>
-                <div class="form-group">
-                    <label for="new-password">새 비밀번호 (8자 이상)</label>
-                    <input type="password" id="new-password" placeholder="새 비밀번호를 입력하세요">
-                </div>
-                <div class="form-group">
-                    <label for="confirm-new-password">새 비밀번호 확인</label>
-                    <input type="password" id="confirm-new-password" placeholder="새 비밀번호를 다시 입력하세요">
-                </div>
-                <div id="reset-error" class="error hidden"></div>
-                <button id="reset-password-btn">비밀번호 재설정</button>
-                
-                <div class="form-switch">
-                    <a id="show-login-from-forgot">로그인 화면으로 돌아가기</a>
-                </div>
-            </div>
-        </div>
+        <button id="googleLoginBtn" class="w-full bg-yellow-500 text-white py-2 rounded-md hover:bg-yellow-600 transition mt-4">구글 로그인</button>
+        <button id="resetPasswordBtn" class="w-full bg-gray-500 text-white py-2 rounded-md hover:bg-gray-600 transition mt-4">비밀번호 재설정</button>
+        <button id="logoutBtn" class="w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition mt-4 hidden">로그아웃</button>
+
+        <p id="message" class="text-center text-red-500 mt-4"></p>
     </div>
 
     <script>
-        // DOM 요소
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const forgotForm = document.getElementById('forgot-form');
-        
-        // 폼 표시/숨기기
-        document.getElementById('show-register').addEventListener('click', () => {
-            loginForm.classList.add('hidden');
-            registerForm.classList.remove('hidden');
-            forgotForm.classList.add('hidden');
+        // ✅ Firebase 초기화
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdzMBmsEGCETm3Tf7N-op5ANgsydjkMWc",
+            authDomain: "login-ddb0a.firebaseapp.com",
+            projectId: "login-ddb0a",
+            storageBucket: "login-ddb0a.firebasestorage.app",
+            messagingSenderId: "722735085241",
+            appId: "1:722735085241:web:9dde97154af644a4c1cd68",
+            measurementId: "G-4B9B610VMH"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // ✅ 회원가입 기능
+        document.getElementById("signupForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const email = document.getElementById("signupEmail").value;
+            const password = document.getElementById("signupPassword").value;
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(() => {
+                    alert("회원가입 성공!");
+                })
+                .catch(error => {
+                    alert("회원가입 실패: " + error.message);
+                });
         });
-        
-        document.getElementById('show-forgot').addEventListener('click', () => {
-            loginForm.classList.add('hidden');
-            registerForm.classList.add('hidden');
-            forgotForm.classList.remove('hidden');
+
+        // ✅ 로그인 기능
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const email = document.getElementById("loginEmail").value;
+            const password = document.getElementById("loginPassword").value;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    alert("로그인 성공!");
+                    document.getElementById("logoutBtn").classList.remove("hidden");
+                })
+                .catch(error => {
+                    alert("로그인 실패: " + error.message);
+                });
         });
-        
-        document.getElementById('show-login-from-register').addEventListener('click', () => {
-            loginForm.classList.remove('hidden');
-            registerForm.classList.add('hidden');
-            forgotForm.classList.add('hidden');
+
+        // ✅ 로그아웃 기능
+        document.getElementById("logoutBtn").addEventListener("click", function() {
+            auth.signOut().then(() => {
+                alert("로그아웃 완료!");
+                document.getElementById("logoutBtn").classList.add("hidden");
+            });
         });
-        
-        document.getElementById('show-login-from-forgot').addEventListener('click', () => {
-            loginForm.classList.remove('hidden');
-            registerForm.classList.add('hidden');
-            forgotForm.classList.add('hidden');
+
+        // ✅ 로그인 상태 확인
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById("logoutBtn").classList.remove("hidden");
+            } else {
+                document.getElementById("logoutBtn").classList.add("hidden");
+            }
         });
-        
-        // 회원가입 프로세스
-        let verificationCode = '';
-        
-        document.getElementById('send-verification-btn').addEventListener('click', () => {
-            const email = document.getElementById('reg-email').value;
-            
-            if (!email) {
-                showError('register-error', '이메일을 입력해주세요');
-                return;
+
+        // ✅ 비밀번호 재설정 기능
+        document.getElementById("resetPasswordBtn").addEventListener("click", function() {
+            const email = prompt("비밀번호 재설정 링크를 받을 이메일을 입력하세요:");
+            if (email) {
+                auth.sendPasswordResetEmail(email)
+                    .then(() => alert("비밀번호 재설정 메일을 보냈습니다."))
+                    .catch(error => alert("오류 발생: " + error.message));
             }
-            
-            if (!validateEmail(email)) {
-                showError('register-error', '유효한 이메일 주소를 입력해주세요');
-                return;
-            }
-            
-            // 실제 구현에서는 백엔드로 이메일 발송 요청
-            verificationCode = generateRandomCode();
-            console.log(`${email}로 발송된 인증코드: ${verificationCode}`); // 데모용
-            
-            document.getElementById('email-sent-msg').classList.remove('hidden');
-            document.getElementById('verification-section').classList.remove('hidden');
-            clearError('register-error');
         });
-        
-        document.getElementById('register-btn').addEventListener('click', () => {
-            const code = document.getElementById('verification-code').value;
-            const username = document.getElementById('reg-username').value;
-            const password = document.getElementById('reg-password').value;
-            const confirmPassword = document.getElementById('reg-confirm-password').value;
-            
-            if (code !== verificationCode) {
-                showError('register-error', '인증코드가 일치하지 않습니다');
-                return;
-            }
-            
-            if (!username) {
-                showError('register-error', '아이디를 입력해주세요');
-                return;
-            }
-            
-            if (!/^[a-zA-Z]+$/.test(username)) {
-                showError('register-error', '아이디는 영문만 사용 가능합니다');
-                return;
-            }
-            
-            if (!password) {
-                showError('register-error', '비밀번호를 입력해주세요');
-                return;
-            }
-            
-            if (password.length < 8) {
-                showError('register-error', '비밀번호는 8자 이상이어야 합니다');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showError('register-error', '비밀번호가 일치하지 않습니다');
-                return;
-            }
-            
-            // 실제 구현에서는 백엔드로 회원가입 요청
-            console.log('회원가입 성공:', { username, password, email: document.getElementById('reg-email').value });
-            alert('회원가입이 완료되었습니다! 로그인해주세요.');
-            
-            // 로그인 폼으로 전환
-            loginForm.classList.remove('hidden');
-            registerForm.classList.add('hidden');
-            forgotForm.classList.add('hidden');
-            
-            // 폼 초기화
-            resetForm('register-form');
+
+        // ✅ 구글 로그인 기능
+        document.getElementById("googleLoginBtn").addEventListener("click", function() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then(result => {
+                    alert("구글 로그인 성공!");
+                    document.getElementById("logoutBtn").classList.remove("hidden");
+                })
+                .catch(error => {
+                    alert("구글 로그인 실패: " + error.message);
+                });
         });
-        
-        // 비밀번호 재설정 프로세스
-        let resetCode = '';
-        
-        document.getElementById('send-reset-code-btn').addEventListener('click', () => {
-            const email = document.getElementById('forgot-email').value;
-            
-            if (!email) {
-                showError('reset-error', '이메일을 입력해주세요');
-                return;
-            }
-            
-            if (!validateEmail(email)) {
-                showError('reset-error', '유효한 이메일 주소를 입력해주세요');
-                return;
-            }
-            
-            // 실제 구현에서는 가입된 이메일인지 확인 후 코드 발송
-            resetCode = generateRandomCode();
-            console.log(`${email}로 발송된 재설정 코드: ${resetCode}`); // 데모용
-            
-            document.getElementById('reset-code-sent-msg').classList.remove('hidden');
-            document.getElementById('reset-section').classList.remove('hidden');
-            clearError('reset-error');
-        });
-        
-        document.getElementById('reset-password-btn').addEventListener('click', () => {
-            const code = document.getElementById('reset-code').value;
-            const newPassword = document.getElementById('new-password').value;
-            const confirmNewPassword = document.getElementById('confirm-new-password').value;
-            
-            if (code !== resetCode) {
-                showError('reset-error', '재설정 코드가 일치하지 않습니다');
-                return;
-            }
-            
-            if (!newPassword) {
-                showError('reset-error', '새 비밀번호를 입력해주세요');
-                return;
-            }
-            
-            if (newPassword.length < 8) {
-                showError('reset-error', '비밀번호는 8자 이상이어야 합니다');
-                return;
-            }
-            
-            if (newPassword !== confirmNewPassword) {
-                showError('reset-error', '비밀번호가 일치하지 않습니다');
-                return;
-            }
-            
-            // 실제 구현에서는 백엔드로 비밀번호 업데이트 요청
-            console.log('비밀번호 재설정 성공:', document.getElementById('forgot-email').value);
-            alert('비밀번호가 성공적으로 재설정되었습니다! 새 비밀번호로 로그인해주세요.');
-            
-            // 로그인 폼으로 전환
-            loginForm.classList.remove('hidden');
-            registerForm.classList.add('hidden');
-            forgotForm.classList.add('hidden');
-            
-            // 폼 초기화
-            resetForm('forgot-form');
-        });
-        
-        // 로그인 프로세스
-        document.getElementById('login-btn').addEventListener('click', () => {
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-            
-            if (!username || !password) {
-                showError('login-error', '아이디와 비밀번호를 모두 입력해주세요');
-                return;
-            }
-            
-            // 실제 구현에서는 백엔드로 인증 요청
-            console.log('로그인 시도:', { username, password });
-            
-            // 데모용 성공 메시지
-            alert('로그인 성공! (데모 버전입니다)');
-            clearError('login-error');
-        });
-        
-        // 헬퍼 함수
-        function generateRandomCode() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
-        }
-        
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
-        
-        function showError(elementId, message) {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.classList.remove('hidden');
-        }
-        
-        function clearError(elementId) {
-            const element = document.getElementById(elementId);
-            element.textContent = '';
-            element.classList.add('hidden');
-        }
-        
-        function resetForm(formId) {
-            const form = document.getElementById(formId);
-            const inputs = form.querySelectorAll('input');
-            inputs.forEach(input => input.value = '');
-            
-            const messages = form.querySelectorAll('.success, .error');
-            messages.forEach(msg => msg.classList.add('hidden'));
-            
-            if (formId === 'register-form') {
-                document.getElementById('verification-section').classList.add('hidden');
-            } else if (formId === 'forgot-form') {
-                document.getElementById('reset-section').classList.add('hidden');
-            }
-        }
+
     </script>
+
+    <!-- ✅ 요청한 Firebase 최신 SDK 추가 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdzMBmsEGCETm3Tf7N-op5ANgsydjkMWc",
+            authDomain: "login-ddb0a.firebaseapp.com",
+            projectId: "login-ddb0a",
+            storageBucket: "login-ddb0a.firebasestorage.app",
+            messagingSenderId: "722735085241",
+            appId: "1:722735085241:web:9dde97154af644a4c1cd68",
+            measurementId: "G-4B9B610VMH"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
+
 </body>
 </html>
