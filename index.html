@@ -24,7 +24,6 @@
             <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">로그인</button>
         </form>
 
-        <button id="googleLoginBtn" class="w-full bg-yellow-500 text-white py-2 rounded-md hover:bg-yellow-600 transition mt-4">구글 로그인</button>
         <button id="resetPasswordBtn" class="w-full bg-gray-500 text-white py-2 rounded-md hover:bg-gray-600 transition mt-4">비밀번호 재설정</button>
         <button id="logoutBtn" class="w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition mt-4 hidden">로그아웃</button>
 
@@ -54,10 +53,14 @@
 
             auth.createUserWithEmailAndPassword(email, password)
                 .then(() => {
-                    alert("회원가입 성공!");
+                    document.getElementById("message").textContent = "회원가입 성공!";
+                    document.getElementById("message").classList.remove("text-red-500");
+                    document.getElementById("message").classList.add("text-green-500");
                 })
                 .catch(error => {
-                    alert("회원가입 실패: " + error.message);
+                    document.getElementById("message").textContent = "회원가입 실패: " + error.message;
+                    document.getElementById("message").classList.remove("text-green-500");
+                    document.getElementById("message").classList.add("text-red-500");
                 });
         });
 
@@ -69,18 +72,24 @@
 
             auth.signInWithEmailAndPassword(email, password)
                 .then(() => {
-                    alert("로그인 성공!");
+                    document.getElementById("message").textContent = "로그인 성공!";
+                    document.getElementById("message").classList.remove("text-red-500");
+                    document.getElementById("message").classList.add("text-green-500");
                     document.getElementById("logoutBtn").classList.remove("hidden");
                 })
                 .catch(error => {
-                    alert("로그인 실패: " + error.message);
+                    document.getElementById("message").textContent = "로그인 실패: " + error.message;
+                    document.getElementById("message").classList.remove("text-green-500");
+                    document.getElementById("message").classList.add("text-red-500");
                 });
         });
 
         // ✅ 로그아웃 기능
         document.getElementById("logoutBtn").addEventListener("click", function() {
             auth.signOut().then(() => {
-                alert("로그아웃 완료!");
+                document.getElementById("message").textContent = "로그아웃 완료!";
+                document.getElementById("message").classList.remove("text-red-500");
+                document.getElementById("message").classList.add("text-green-500");
                 document.getElementById("logoutBtn").classList.add("hidden");
             });
         });
@@ -104,22 +113,9 @@
             }
         });
 
-        // ✅ 구글 로그인 기능
-        document.getElementById("googleLoginBtn").addEventListener("click", function() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider)
-                .then(result => {
-                    alert("구글 로그인 성공!");
-                    document.getElementById("logoutBtn").classList.remove("hidden");
-                })
-                .catch(error => {
-                    alert("구글 로그인 실패: " + error.message);
-                });
-        });
-
     </script>
 
-    <!-- ✅ 요청한 Firebase 최신 SDK 추가 -->
+    <!-- ✅ Firebase 최신 SDK 추가 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
