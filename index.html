@@ -374,8 +374,8 @@
             const messageDiv = document.getElementById('signup-message');
             
             // 유효성 검사
-            if (referralCode !== '2028317') {
-                messageDiv.textContent = '유효하지 않은 추천인 코드입니다. 허용된 코드: 2028317';
+            if (referralCode !== '2028317', '6389') {
+                messageDiv.textContent = '유효하지 않은 추천인 코드입니다.';
                 messageDiv.className = 'message error';
                 messageDiv.classList.remove('hidden');
                 return;
