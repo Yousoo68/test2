@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입</title>
+    <title>회원가입 및 로그인</title>
     <style>
         :root {
             --primary-color: #4361ee;
@@ -328,17 +328,52 @@
             
             return Math.min(strength, 100);
         }
+    </script>
+
+    <!-- Firebase 통합 인증 시스템 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+
+        // Firebase 설정
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdzMBmsEGCETm3Tf7N-op5ANgsydjkMWc",
+            authDomain: "login-ddb0a.firebaseapp.com",
+            projectId: "login-ddb0a",
+            storageBucket: "login-ddb0a.firebasestorage.app",
+            messagingSenderId: "722735085241",
+            appId: "1:722735085241:web:9dde97154af644a4c1cd68",
+            measurementId: "G-4B9B610VMH"
+        };
+
+        // Firebase 초기화
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // 인증 상태 관찰자 (크로스 디바이스 로그인 지원)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log('사용자 로그인 상태:', user.email);
+                // 필요한 경우 여기서 UI 업데이트
+            } else {
+                console.log('사용자 로그아웃 상태');
+            }
+        });
 
         // 회원가입 처리
-        document.getElementById('signup-form').addEventListener('submit', function(e) {
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const id = document.getElementById('signup-id').value;
+            const username = document.getElementById('signup-id').value;
             const password = document.getElementById('signup-password').value;
             const referralCode = document.getElementById('referral-code').value;
             const messageDiv = document.getElementById('signup-message');
             
-            // 추천인 코드 검증
+            // 유효성 검사
             if (referralCode !== '2028317') {
                 messageDiv.textContent = '유효하지 않은 추천인 코드입니다. 허용된 코드: 2028317';
                 messageDiv.className = 'message error';
@@ -346,135 +381,105 @@
                 return;
             }
             
-            // 비밀번호 길이 검증
-            if (password.length < 8) {
-                messageDiv.textContent = '비밀번호는 8자 이상이어야 합니다.';
-                messageDiv.className = 'message error';
-                messageDiv.classList.remove('hidden');
-                return;
-            }
-            
-            // 아이디 영문 검증
-            if (!/^[A-Za-z]+$/.test(id)) {
+            if (!/^[A-Za-z]+$/.test(username)) {
                 messageDiv.textContent = '아이디는 영문만 사용 가능합니다.';
                 messageDiv.className = 'message error';
                 messageDiv.classList.remove('hidden');
                 return;
             }
             
-            // 사용자 정보 저장 (실제로는 서버에 전송해야 함)
-            localStorage.setItem('user_' + id, JSON.stringify({
-                id: id,
-                password: password // 실제 애플리케이션에서는 절대 이렇게 저장하지 마세요! 해시 처리 필요
-            }));
-            
-            messageDiv.textContent = '회원가입이 완료되었습니다! 이제 로그인할 수 있습니다.';
-            messageDiv.className = 'message success';
-            messageDiv.classList.remove('hidden');
-            
-            // 회원가입 후 로그인 탭으로 전환
-            document.querySelector('.tab[data-tab="login"]').click();
-            
-            // 폼 초기화
-            this.reset();
-            document.getElementById('password-strength-bar').style.width = '0%';
+            if (password.length < 8) {
+                messageDiv.textContent = '비밀번호는 8자 이상이어야 합니다.';
+                messageDiv.className = 'message error';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                // Firebase는 이메일 형식 필요 (임의 도메인 추가)
+                const email = `${username}@yourdomain.com`;
+                await createUserWithEmailAndPassword(auth, email, password);
+                
+                messageDiv.textContent = '회원가입이 완료되었습니다! 이제 로그인할 수 있습니다.';
+                messageDiv.className = 'message success';
+                messageDiv.classList.remove('hidden');
+                
+                // 회원가입 후 로그인 탭으로 전환
+                document.querySelector('.tab[data-tab="login"]').click();
+                
+                // 폼 초기화
+                e.target.reset();
+                document.getElementById('password-strength-bar').style.width = '0%';
+            } catch (error) {
+                let errorMessage = '회원가입 실패: ';
+                switch(error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage += '이미 사용 중인 아이디입니다.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage += '유효하지 않은 아이디 형식입니다.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage += '비밀번호가 너무 약합니다. 8자 이상이어야 합니다.';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+                
+                messageDiv.textContent = errorMessage;
+                messageDiv.className = 'message error';
+                messageDiv.classList.remove('hidden');
+            }
         });
 
         // 로그인 처리
-        document.getElementById('login-form').addEventListener('submit', function(e) {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const id = document.getElementById('login-id').value;
+            const username = document.getElementById('login-id').value;
             const password = document.getElementById('login-password').value;
             const rememberMe = document.getElementById('remember-id').checked;
             const messageDiv = document.getElementById('login-message');
             
-            // 저장된 사용자 정보 가져오기
-            const userData = JSON.parse(localStorage.getItem('user_' + id));
-            
-            if (!userData) {
-                messageDiv.textContent = '존재하지 않는 아이디입니다.';
+            try {
+                const email = `${username}@yourdomain.com`;
+                await signInWithEmailAndPassword(auth, email, password);
+                
+                // 로그인 성공 - 아이디 저장 (로컬 스토리지)
+                if (rememberMe) {
+                    localStorage.setItem('savedUserId', username);
+                } else {
+                    localStorage.removeItem('savedUserId');
+                }
+                
+                messageDiv.textContent = '로그인 성공! 환영합니다, ' + username + '님!';
+                messageDiv.className = 'message success';
+                messageDiv.classList.remove('hidden');
+                
+                // 2초 후 리디렉션 (실제 사용시 주석 해제)
+                setTimeout(() => {
+                    // window.location.href = '/dashboard.html';
+                }, 2000);
+            } catch (error) {
+                let errorMessage = '로그인 실패: ';
+                switch(error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage += '존재하지 않는 아이디입니다.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage += '비밀번호가 일치하지 않습니다.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage += '유효하지 않은 아이디 형식입니다.';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+                
+                messageDiv.textContent = errorMessage;
                 messageDiv.className = 'message error';
                 messageDiv.classList.remove('hidden');
-                return;
             }
-            
-            if (userData.password !== password) {
-                messageDiv.textContent = '비밀번호가 일치하지 않습니다.';
-                messageDiv.className = 'message error';
-                messageDiv.classList.remove('hidden');
-                return;
-            }
-            
-            // 로그인 성공 - 아이디 저장
-            if (rememberMe) {
-                localStorage.setItem('savedUserId', id);
-            } else {
-                localStorage.removeItem('savedUserId');
-            }
-            
-            messageDiv.textContent = '로그인 성공! 환영합니다, ' + id + '님!';
-            messageDiv.className = 'message success';
-            messageDiv.classList.remove('hidden');
-            
-            // 2초 후 리디렉션 (예시)
-            setTimeout(() => {
-                // window.location.href = '/dashboard.html'; // 실제로는 대시보드 페이지로 이동
-            }, 2000);
         });
-    </script>
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-      import { 
-        getAuth, 
-        createUserWithEmailAndPassword, 
-        signInWithEmailAndPassword 
-      } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
-
-      // Firebase 설정 (기존 코드와 동일)
-      const firebaseConfig = {
-        apiKey: "AIzaSyBdzMBmsEGCETm3Tf7N-op5ANgsydjkMWc",
-        authDomain: "login-ddb0a.firebaseapp.com",
-        projectId: "login-ddb0a",
-        storageBucket: "login-ddb0a.firebasestorage.app",
-        messagingSenderId: "722735085241",
-        appId: "1:722735085241:web:9dde97154af644a4c1cd68",
-        measurementId: "G-4B9B610VMH"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-
-      // 회원가입 처리
-      document.getElementById('signup-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('signup-id').value;
-        const password = document.getElementById('signup-password').value;
-        
-        try {
-          // Firebase는 이메일 형식 필요 (임의 도메인 추가)
-          const email = `${username}@yourdomain.com`;
-          await createUserWithEmailAndPassword(auth, email, password);
-          alert('회원가입 성공! 이제 로그인하세요.');
-        } catch (error) {
-          alert(`회원가입 실패: ${error.message}`);
-        }
-      });
-
-      // 로그인 처리
-      document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('login-id').value;
-        const password = document.getElementById('login-password').value;
-        
-        try {
-          const email = `${username}@yourdomain.com`;
-          await signInWithEmailAndPassword(auth, email, password);
-          alert('로그인 성공!');
-        } catch (error) {
-          alert(`로그인 실패: ${error.message}`);
-        }
-      });
     </script>
 </body>
 </html>
