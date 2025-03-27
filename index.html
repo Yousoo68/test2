@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>섹시유수 갤러리</title>
+    <title>인증 시스템</title>
     <style>
-        /* 로그인 시스템 스타일 */
         :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3f37c9;
-            --accent-color: #4895ef;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
-            --success-color: #4bb543;
-            --error-color: #ff3333;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4bb543;
+            --error: #ff3333;
+            --radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
         }
         
@@ -23,30 +22,29 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            color: var(--dark-color);
-            line-height: 1.6;
         }
         
         .container {
             width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 500px;
             padding: 2rem;
         }
         
         .auth-container {
             background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             overflow: hidden;
         }
         
@@ -57,7 +55,7 @@
         
         .tab {
             flex: 1;
-            padding: 1.2rem;
+            padding: 1rem;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
@@ -66,18 +64,10 @@
             background: #f1f1f1;
         }
         
-        .tab:first-child {
-            border-top-left-radius: var(--border-radius);
-        }
-        
-        .tab:last-child {
-            border-top-right-radius: var(--border-radius);
-        }
-        
         .tab.active {
             background: white;
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--primary-color);
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
         }
         
         .tab-content {
@@ -86,12 +76,10 @@
         
         .tab-pane {
             display: none;
-        }
-        
-        .tab-pane.active {
-            display: block;
             animation: fadeIn 0.5s ease;
         }
+        
+        .tab-pane.active { display: block; }
         
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -106,31 +94,29 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
-            color: var(--dark-color);
         }
         
         .form-control {
             width: 100%;
             padding: 0.8rem 1rem;
             border: 1px solid #ddd;
-            border-radius: var(--border-radius);
+            border-radius: var(--radius);
             font-size: 1rem;
             transition: var(--transition);
         }
         
         .form-control:focus {
             outline: none;
-            border-color: var(--accent-color);
+            border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
         }
         
         .btn {
-            display: inline-block;
-            background: var(--primary-color);
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: var(--border-radius);
+            padding: 0.8rem;
+            border-radius: var(--radius);
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
@@ -139,345 +125,122 @@
         }
         
         .btn:hover {
-            background: var(--secondary-color);
+            background: var(--secondary);
             transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: var(--error);
+        }
+        
+        .btn-danger:hover {
+            background: #d62c2c;
         }
         
         .message {
             padding: 0.8rem 1rem;
-            border-radius: var(--border-radius);
+            border-radius: var(--radius);
             margin-bottom: 1.5rem;
             font-size: 0.9rem;
         }
         
-        .message.success {
-            background-color: rgba(75, 181, 67, 0.1);
-            color: var(--success-color);
-            border: 1px solid rgba(75, 181, 67, 0.3);
-        }
+        .success { background-color: rgba(75, 181, 67, 0.1); color: var(--success); border: 1px solid rgba(75, 181, 67, 0.3); }
+        .error { background-color: rgba(255, 51, 51, 0.1); color: var(--error); border: 1px solid rgba(255, 51, 51, 0.3); }
+        .hidden { display: none !important; }
         
-        .message.error {
-            background-color: rgba(255, 51, 51, 0.1);
-            color: var(--error-color);
-            border: 1px solid rgba(255, 51, 51, 0.3);
-        }
-        
-        .remember-me {
-            display: flex;
-            align-items: center;
+        .current-user-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: var(--radius);
             margin-bottom: 1.5rem;
-        }
-        
-        .remember-me input {
-            margin-right: 0.5rem;
-        }
-        
-        .password-strength {
-            height: 4px;
-            background: #eee;
-            margin-top: 0.5rem;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        
-        .strength-bar {
-            height: 100%;
-            width: 0%;
-            background: var(--error-color);
-            transition: var(--transition);
-        }
-        
-        .password-hint {
-            font-size: 0.8rem;
-            color: #666;
-            margin-top: 0.3rem;
-        }
-        
-        /* 갤러리 콘텐츠 스타일 */
-        .content {
-            display: none;
-            text-align: center;
-            width: 90%;
-        }
-
-        .gallery-title {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .button-container {
-            margin-top: 40px;
-        }
-
-        .gallery-btn {
-            font-size: 17pt;
-            color: black;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 10px;
-            margin: 40px 0;
-            width: fit-content;
-            cursor: pointer;
-            background: none;
-            border: none;
-            text-decoration: none;
-        }
-
-        .gallery-btn.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        .gallery-btn img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .reader-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            margin-bottom: 40px;
-        }
-
-        .reader-container img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .reader-container p {
-            margin: 0;
-            font-size: 17pt;
-        }
-
-        .vault-link {
-            pointer-events: none;
-            display: block;
-            margin: 20px auto;
             text-align: center;
         }
-
-        .vault-link img {
-            width: 100%;
-            max-width: 600px;
-            height: auto;
+        
+        .current-user-info p {
+            margin-bottom: 0.5rem;
         }
-
-        .vault-small {
-            display: block;
-            margin: 10px auto;
-            width: 100%;
-            height: auto;
-        }
-
-        /* 추가된 스타일 */
-        .hidden {
-            display: none !important;
-        }
-
+        
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            .tab {
-                padding: 1rem;
-                font-size: 0.9rem;
-            }
-            
-            .tab-content {
-                padding: 1.5rem;
-            }
+            .container { padding: 1rem; }
+            .tab-content { padding: 1.5rem; }
         }
     </style>
 </head>
 <body>
-    <!-- 로그인 시스템 -->
-    <div class="container" id="authSection">
+    <div class="container">
         <div class="auth-container">
             <div class="tabs">
                 <div class="tab active" data-tab="login">로그인</div>
                 <div class="tab" data-tab="signup">회원가입</div>
+                <div class="tab" data-tab="delete">계정 삭제</div>
             </div>
             
             <div class="tab-content">
-                <!-- 로그인 탭 -->
+                <!-- Login Tab -->
                 <div id="login" class="tab-pane active">
                     <div id="login-message" class="message hidden"></div>
-                    
                     <form id="login-form">
                         <div class="form-group">
                             <label for="login-id">아이디</label>
-                            <input type="text" id="login-id" class="form-control" placeholder="아이디를 입력하세요" required>
+                            <input type="text" id="login-id" class="form-control" placeholder="아이디" required>
                         </div>
-                        
                         <div class="form-group">
                             <label for="login-password">비밀번호</label>
-                            <input type="password" id="login-password" class="form-control" placeholder="비밀번호를 입력하세요" required>
+                            <input type="password" id="login-password" class="form-control" placeholder="비밀번호" required>
                         </div>
-                        
-                        <div class="remember-me">
-                            <input type="checkbox" id="remember-id" checked>
-                            <label for="remember-id">아이디 저장</label>
-                        </div>
-                        
                         <button type="submit" class="btn">로그인</button>
                     </form>
                 </div>
                 
-                <!-- 회원가입 탭 -->
+                <!-- Signup Tab -->
                 <div id="signup" class="tab-pane">
                     <div id="signup-message" class="message hidden"></div>
-                    
                     <form id="signup-form">
                         <div class="form-group">
-                            <label for="signup-id">아이디 (영문만 가능)</label>
-                            <input type="text" id="signup-id" class="form-control" placeholder="영문 아이디를 입력하세요" pattern="[A-Za-z]+" title="영문만 입력해주세요" required>
+                            <label for="signup-id">아이디 (영문만)</label>
+                            <input type="text" id="signup-id" class="form-control" placeholder="영문 아이디" pattern="[A-Za-z]+" required>
                         </div>
-                        
                         <div class="form-group">
                             <label for="signup-password">비밀번호 (8자 이상)</label>
-                            <input type="password" id="signup-password" class="form-control" placeholder="8자 이상 비밀번호를 입력하세요" minlength="8" required>
-                            <div class="password-strength">
-                                <div class="strength-bar" id="password-strength-bar"></div>
-                            </div>
-                            <div class="password-hint">비밀번호는 8자 이상이어야 합니다.</div>
+                            <input type="password" id="signup-password" class="form-control" placeholder="8자 이상" minlength="8" required>
                         </div>
-                        
                         <div class="form-group">
                             <label for="referral-code">추천인 코드</label>
-                            <input type="text" id="referral-code" class="form-control" placeholder="추천인 코드를 입력하세요" required>
+                            <input type="text" id="referral-code" class="form-control" placeholder="2028317 또는 6389" required>
                         </div>
-                        
                         <button type="submit" class="btn">회원가입</button>
                     </form>
+                </div>
+                
+                <!-- Delete Account Tab -->
+                <div id="delete" class="tab-pane">
+                    <div id="delete-message" class="message hidden"></div>
+                    <div id="current-user-info" class="current-user-info hidden">
+                        <p><strong>현재 로그인된 계정:</strong></p>
+                        <p id="current-user-email"></p>
+                        <button id="delete-account-btn" class="btn btn-danger" style="margin-top: 1rem;">계정 삭제</button>
+                    </div>
+                    <div id="not-logged-in-message" class="message">
+                        계정 삭제를 위해서는 먼저 로그인해주세요.
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 갤러리 콘텐츠 (로그인해야 보임) -->
-    <div class="content hidden" id="content">
-        <img class="gallery-title" src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Gallery.png" alt="섹시유수 갤러리">
-
-        <!-- 독자 목록 및 ReaderList 이미지 -->
-        <div class="reader-container">
-            <img src="https://raw.githubusercontent.com/Yousoo68/H2JhFqK/refs/heads/main/ReaderList.png" alt="ReaderList">
-            <a href="https://yousoo68.github.io/jh6RTBZ/" style="text-decoration: none; color: black;">
-                <p>쁘띠/섹시유수 독자 목록</p>
-            </a>
-        </div>
-
-        <div class="button-container">
-            <a class="gallery-btn disabled" id="diary" href="https://www.instagram.com/sexyyousoo/?__pwa=1">
-                <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Insta.jpg" alt="diary">
-                섹시유수의 비밀 일기
-            </a>
-            <a class="gallery-btn disabled" id="note" href="https://m.youtube.com/playlist?list=PLxefOlZhxI_1s42VUk1SMJpYwJKC4MK68">
-                <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Note.jpg" alt="note">
-                인생노트
-            </a>
-            <a class="gallery-btn disabled" id="ssul" href="https://yousoo68.github.io/SSUL/">
-                <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/SSUL.jpg" alt="ssul">
-                섹시유수의 비밀 썰
-            </a>
-            <a class="gallery-btn disabled" id="cuttoon" href="https://docs.google.com/document/u/0/d/1zFtfcSMpRMK2dg-sx1D2ladmQ3DV14aKxHfytMfRT2E/mobilebasic?fbclid=PAY2xjawIstlVleHRuA2FlbQIxMAABpsVKLg0NY2Dh3E96VC1f1BAmDoc9Si-Aurz6GEjHyAFHibcxV_HYi4Da1A_aem_6QJoWJi3HKdSITYRU8OtVQ&pli=1">
-                <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/CutToon.jpg" alt="cuttoon">
-                섹시유수 컷툰
-            </a>
-
-            <a class="gallery-btn disabled" id="travel" href="https://yousoo68.github.io/H2JhFqK/" style="margin-top: 40px;">
-                <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Travel.jpg" alt="travel">
-                섹시유수의 여행일지
-            </a>
-
-            <a class="gallery-btn disabled" id="diy" href="https://m.youtube.com/playlist?list=PLxefOlZhxI_3HEZdLOfsV5hoLLUdz2Cbg" style="display: none;">
-                <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/DIY.jpg" alt="diy">
-                DIY오나홀
-            </a>
-        </div>
-
-        <!-- vault 이미지 -->
-        <a class="vault-link disabled" id="vault">
-            <img src="https://raw.githubusercontent.com/Yousoo68/photo/refs/heads/main/blank.jpg" alt="blank">
-        </a>
-        <!-- Vault.jpg 이미지 (작은 크기로 배치) -->
-        <img class="vault-small" src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Vault.jpg" alt="vault-small">
-    </div>
-
-    <script>
-        // 탭 전환 기능
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                // 모든 탭 비활성화
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-                
-                // 현재 탭 활성화
-                this.classList.add('active');
-                const tabId = this.getAttribute('data-tab');
-                document.getElementById(tabId).classList.add('active');
-            });
-        });
-
-        // 페이지 로드 시 저장된 아이디가 있으면 표시
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedId = localStorage.getItem('savedUserId');
-            if (savedId) {
-                document.getElementById('login-id').value = savedId;
-                document.getElementById('remember-id').checked = true;
-            }
-            
-            // 비밀번호 강도 표시
-            const passwordInput = document.getElementById('signup-password');
-            const strengthBar = document.getElementById('password-strength-bar');
-            
-            if (passwordInput && strengthBar) {
-                passwordInput.addEventListener('input', function() {
-                    const strength = calculatePasswordStrength(this.value);
-                    strengthBar.style.width = strength + '%';
-                    
-                    if (strength < 30) {
-                        strengthBar.style.backgroundColor = 'var(--error-color)';
-                    } else if (strength < 70) {
-                        strengthBar.style.backgroundColor = '#ffa500';
-                    } else {
-                        strengthBar.style.backgroundColor = 'var(--success-color)';
-                    }
-                });
-            }
-        });
-        
-        function calculatePasswordStrength(password) {
-            let strength = 0;
-            
-            // 길이 검사
-            strength += Math.min(password.length * 5, 50);
-            
-            // 문자 다양성 검사
-            if (/[A-Z]/.test(password)) strength += 10;
-            if (/[0-9]/.test(password)) strength += 10;
-            if (/[^A-Za-z0-9]/.test(password)) strength += 10;
-            
-            return Math.min(strength, 100);
-        }
-    </script>
-
-    <!-- Firebase 통합 인증 시스템 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         import { 
             getAuth, 
             createUserWithEmailAndPassword, 
             signInWithEmailAndPassword,
-            onAuthStateChanged
+            onAuthStateChanged,
+            deleteUser,
+            reauthenticateWithCredential,
+            EmailAuthProvider
         } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
 
-        // Firebase 설정
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBdzMBmsEGCETm3Tf7N-op5ANgsydjkMWc",
             authDomain: "login-ddb0a.firebaseapp.com",
@@ -488,146 +251,149 @@
             measurementId: "G-4B9B610VMH"
         };
 
-        // Firebase 초기화
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // 인증 상태 관찰자 (크로스 디바이스 로그인 지원)
-        onAuthStateChanged(auth, (user) => {
-            const authSection = document.getElementById('authSection');
-            const contentSection = document.getElementById('content');
-            
-            if (user) {
-                console.log('사용자 로그인 상태:', user.email);
-                // 로그인 상태: 인증 섹션 숨기고 콘텐츠 표시
-                authSection.classList.add('hidden');
-                contentSection.classList.remove('hidden');
+        // Tab Switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
                 
-                // 추천인에 따라 접근 가능한 항목 설정
-                // 여기서는 임시로 모든 버튼 활성화 (실제로는 Firebase에서 추천인 정보 가져와야 함)
-                document.querySelectorAll('.gallery-btn').forEach(btn => {
-                    btn.classList.remove('disabled');
-                });
-                document.getElementById('vault').classList.remove('disabled');
-                document.getElementById('diy').style.display = 'flex';
-            } else {
-                console.log('사용자 로그아웃 상태');
-                // 로그아웃 상태: 인증 섹션 표시하고 콘텐츠 숨기기
-                authSection.classList.remove('hidden');
-                contentSection.classList.add('hidden');
-            }
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
         });
 
-        // 회원가입 처리
+        // Signup Form
         document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('signup-id').value;
-            const password = document.getElementById('signup-password').value;
-            const referralCode = document.getElementById('referral-code').value;
+            const username = e.target['signup-id'].value;
+            const password = e.target['signup-password'].value;
+            const referralCode = e.target['referral-code'].value;
             const messageDiv = document.getElementById('signup-message');
             
-            // 유효성 검사
-            if (referralCode !== '2028317' && referralCode !== '6389') {
-                messageDiv.textContent = '유효하지 않은 추천인 코드입니다. 허용된 코드: 2028317 또는 6389';
-                messageDiv.className = 'message error';
-                messageDiv.classList.remove('hidden');
+            if (!['2028317', '6389'].includes(referralCode)) {
+                showMessage(messageDiv, '유효하지 않은 추천인 코드입니다.', 'error');
                 return;
             }
             
-            if (!/^[A-Za-z]+$/.test(username)) {
-                messageDiv.textContent = '아이디는 영문만 사용 가능합니다.';
-                messageDiv.className = 'message error';
-                messageDiv.classList.remove('hidden');
-                return;
-            }
-            
-            if (password.length < 8) {
-                messageDiv.textContent = '비밀번호는 8자 이상이어야 합니다.';
-                messageDiv.className = 'message error';
-                messageDiv.classList.remove('hidden');
-                return;
-            }
-
             try {
-                // Firebase는 이메일 형식 필요 (임의 도메인 추가)
                 const email = `${username}@yourdomain.com`;
                 await createUserWithEmailAndPassword(auth, email, password);
-                
-                messageDiv.textContent = '회원가입이 완료되었습니다! 이제 로그인할 수 있습니다.';
-                messageDiv.className = 'message success';
-                messageDiv.classList.remove('hidden');
-                
-                // 회원가입 후 로그인 탭으로 전환
-                document.querySelector('.tab[data-tab="login"]').click();
-                
-                // 폼 초기화
+                showMessage(messageDiv, '회원가입 성공! 로그인해주세요.', 'success');
                 e.target.reset();
-                document.getElementById('password-strength-bar').style.width = '0%';
             } catch (error) {
-                let errorMessage = '회원가입 실패: ';
-                switch(error.code) {
-                    case 'auth/email-already-in-use':
-                        errorMessage += '이미 사용 중인 아이디입니다.';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage += '유효하지 않은 아이디 형식입니다.';
-                        break;
-                    case 'auth/weak-password':
-                        errorMessage += '비밀번호가 너무 약합니다. 8자 이상이어야 합니다.';
-                        break;
-                    default:
-                        errorMessage += error.message;
-                }
-                
-                messageDiv.textContent = errorMessage;
-                messageDiv.className = 'message error';
-                messageDiv.classList.remove('hidden');
+                handleAuthError(error, messageDiv);
             }
         });
 
-        // 로그인 처리
+        // Login Form
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('login-id').value;
-            const password = document.getElementById('login-password').value;
-            const rememberMe = document.getElementById('remember-id').checked;
+            const username = e.target['login-id'].value;
+            const password = e.target['login-password'].value;
             const messageDiv = document.getElementById('login-message');
             
             try {
                 const email = `${username}@yourdomain.com`;
                 await signInWithEmailAndPassword(auth, email, password);
-                
-                // 로그인 성공 - 아이디 저장 (로컬 스토리지)
-                if (rememberMe) {
-                    localStorage.setItem('savedUserId', username);
-                } else {
-                    localStorage.removeItem('savedUserId');
-                }
-                
-                messageDiv.textContent = '로그인 성공! 환영합니다, ' + username + '님!';
-                messageDiv.className = 'message success';
-                messageDiv.classList.remove('hidden');
+                showMessage(messageDiv, `환영합니다, ${username}님!`, 'success');
+                e.target.reset();
             } catch (error) {
-                let errorMessage = '로그인 실패: ';
-                switch(error.code) {
-                    case 'auth/user-not-found':
-                        errorMessage += '존재하지 않는 아이디입니다.';
-                        break;
-                    case 'auth/wrong-password':
-                        errorMessage += '비밀번호가 일치하지 않습니다.';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage += '유효하지 않은 아이디 형식입니다.';
-                        break;
-                    default:
-                        errorMessage += error.message;
-                }
-                
-                messageDiv.textContent = errorMessage;
-                messageDiv.className = 'message error';
-                messageDiv.classList.remove('hidden');
+                handleAuthError(error, messageDiv);
             }
         });
+
+        // Delete Account Button
+        document.getElementById('delete-account-btn').addEventListener('click', async () => {
+            const user = auth.currentUser;
+            const messageDiv = document.getElementById('delete-message');
+            
+            if (!user) {
+                showMessage(messageDiv, '로그인이 필요합니다.', 'error');
+                return;
+            }
+            
+            try {
+                await deleteUser(user);
+                showMessage(messageDiv, '계정이 성공적으로 삭제되었습니다.', 'success');
+                updateUserUI(null);
+            } catch (error) {
+                // 재인증이 필요한 경우
+                if (error.code === 'auth/requires-recent-login') {
+                    showMessage(messageDiv, '계정 삭제를 위해 다시 로그인해주세요.', 'error');
+                    // 로그인 탭으로 이동
+                    document.querySelector('.tab[data-tab="login"]').click();
+                } else {
+                    handleAuthError(error, messageDiv);
+                }
+            }
+        });
+
+        // Auth State Listener
+        onAuthStateChanged(auth, (user) => {
+            updateUserUI(user);
+        });
+
+        // Helper Functions
+        function updateUserUI(user) {
+            const currentUserInfo = document.getElementById('current-user-info');
+            const notLoggedInMessage = document.getElementById('not-logged-in-message');
+            const currentUserEmail = document.getElementById('current-user-email');
+            
+            if (user) {
+                currentUserInfo.classList.remove('hidden');
+                notLoggedInMessage.classList.add('hidden');
+                currentUserEmail.textContent = user.email;
+            } else {
+                currentUserInfo.classList.add('hidden');
+                notLoggedInMessage.classList.remove('hidden');
+            }
+        }
+
+        function showMessage(element, text, type) {
+            element.textContent = text;
+            element.className = `message ${type}`;
+            element.classList.remove('hidden');
+        }
+
+        function handleAuthError(error, element) {
+            const messages = {
+                'auth/email-already-in-use': '이미 사용 중인 아이디입니다.',
+                'auth/user-not-found': '존재하지 않는 아이디입니다.',
+                'auth/wrong-password': '비밀번호가 일치하지 않습니다.',
+                'auth/invalid-email': '유효하지 않은 아이디 형식입니다.',
+                'auth/weak-password': '비밀번호는 8자 이상이어야 합니다.',
+                'default': error.message
+            };
+            
+            const message = messages[error.code] || messages['default'];
+            showMessage(element, message, 'error');
+        }
+    </script>
+
+    <!-- 추가된 Analytics 스크립트 -->
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
+      
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBdzMBmsEGCETm3Tf7N-op5ANgsydjkMWc",
+        authDomain: "login-ddb0a.firebaseapp.com",
+        projectId: "login-ddb0a",
+        storageBucket: "login-ddb0a.firebasestorage.app",
+        messagingSenderId: "722735085241",
+        appId: "1:722735085241:web:9dde97154af644a4c1cd68",
+        measurementId: "G-4B9B610VMH"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
     </script>
 </body>
 </html>
