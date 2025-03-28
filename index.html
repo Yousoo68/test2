@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>통합 인증 시스템</title>
+    <title>인증 시스템</title>
     <style>
         :root {
             --primary: #4361ee;
@@ -16,6 +16,7 @@
             --radius: 8px;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
+            --google-red: #DB4437;
         }
         
         * {
@@ -122,6 +123,10 @@
             cursor: pointer;
             transition: var(--transition);
             width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         .btn:hover {
@@ -129,27 +134,52 @@
             transform: translateY(-2px);
         }
         
-        .btn-google {
-            background: #4285F4;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .btn-phone {
-            background: #34B7F1;
-        }
-        
         .btn-danger {
             background: var(--error);
         }
         
-        .btn-link {
-            background: none;
-            color: var(--primary);
-            text-decoration: underline;
-            padding: 0;
+        .btn-danger:hover {
+            background: #d62c2c;
+        }
+
+        .btn-google {
+            background: white;
+            color: var(--dark);
+            border: 1px solid #ddd;
+            margin-top: 1rem;
+        }
+
+        .btn-google:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .google-icon {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .divider::before {
+            margin-right: 1rem;
+        }
+
+        .divider::after {
+            margin-left: 1rem;
         }
         
         .message {
@@ -171,8 +201,8 @@
             text-align: center;
         }
         
-        #recaptcha-container {
-            margin: 1rem 0;
+        .current-user-info p {
+            margin-bottom: 0.5rem;
         }
         
         @media (max-width: 768px) {
@@ -204,36 +234,16 @@
                             <input type="password" id="login-password" class="form-control" placeholder="비밀번호" required>
                         </div>
                         <button type="submit" class="btn">로그인</button>
-                    </form>
-                    
-                    <div class="form-group" style="margin-top: 1.5rem;">
-                        <label>소셜 로그인</label>
-                        <button id="google-login-btn" class="btn btn-google">
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
-                                 style="width: 20px; height: 20px;" 
-                                 alt="Google 로고">
+
+                        <div class="divider">또는</div>
+
+                        <button type="button" id="google-login-btn" class="btn btn-google">
+                            <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+                                <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/>
+                            </svg>
                             Google로 로그인
                         </button>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>전화번호 로그인</label>
-                        <input type="tel" id="phone-number" class="form-control" placeholder="+821012345678" required>
-                        <div id="recaptcha-container"></div>
-                        <button id="send-otp-btn" class="btn btn-phone" style="margin-top: 0.5rem;">인증코드 발송</button>
-                        <div id="otp-verify-section" style="display: none;">
-                            <input type="text" id="verification-code" class="form-control" placeholder="6자리 인증코드" style="margin-top: 0.5rem;">
-                            <button id="verify-otp-btn" class="btn" style="margin-top: 0.5rem;">인증하기</button>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <button id="email-link-btn" class="btn-link">이메일 링크로 로그인</button>
-                        <div id="email-link-section" style="display: none; margin-top: 1rem;">
-                            <input type="email" id="email-for-link" class="form-control" placeholder="이메일 주소">
-                            <button id="send-link-btn" class="btn" style="margin-top: 0.5rem;">링크 발송</button>
-                        </div>
-                    </div>
+                    </form>
                 </div>
                 
                 <!-- Signup Tab -->
@@ -250,7 +260,7 @@
                         </div>
                         <div class="form-group">
                             <label for="referral-code">추천인 코드</label>
-                            <input type="text" id="referral-code" class="form-control" placeholder="2028317(섹시유수) 또는 6389(쁘띠유수)" required>
+                            <input type="text" id="referral-code" class="form-control" placeholder="2028317 또는 6389" required>
                         </div>
                         <button type="submit" class="btn">회원가입</button>
                     </form>
@@ -273,8 +283,9 @@
     </div>
 
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
         import { 
-            initializeApp, 
             getAuth, 
             createUserWithEmailAndPassword, 
             signInWithEmailAndPassword,
@@ -282,11 +293,8 @@
             deleteUser,
             GoogleAuthProvider,
             signInWithPopup,
-            signInWithPhoneNumber,
-            RecaptchaVerifier,
-            signInWithEmailLink,
-            isSignInWithEmailLink,
-            sendSignInLinkToEmail
+            reauthenticateWithCredential,
+            EmailAuthProvider
         } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
 
         // Firebase Config
@@ -302,9 +310,9 @@
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
         const auth = getAuth(app);
-        let confirmationResult; // 전화번호 인증 결과 저장
-        let recaptchaVerifier; // reCAPTCHA 검증기
+        const googleProvider = new GoogleAuthProvider();
 
         // Tab Switching
         document.querySelectorAll('.tab').forEach(tab => {
@@ -314,105 +322,23 @@
                 
                 tab.classList.add('active');
                 document.getElementById(tab.dataset.tab).classList.add('active');
-                
-                // 로그인 탭으로 전환 시 reCAPTCHA 초기화
-                if (tab.dataset.tab === 'login') {
-                    initializeRecaptcha();
-                }
             });
         });
 
-        // reCAPTCHA 초기화
-        function initializeRecaptcha() {
-            if (recaptchaVerifier) {
-                recaptchaVerifier.clear();
-            }
-            recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                'size': 'normal',
-                'callback': () => {
-                    // reCAPTCHA 확인 완료 시 자동 실행
-                    document.getElementById('send-otp-btn').click();
-                }
-            });
-        }
-
-        // 구글 로그인
+        // Google Login
         document.getElementById('google-login-btn').addEventListener('click', async () => {
-            const provider = new GoogleAuthProvider();
+            const messageDiv = document.getElementById('login-message');
+            
             try {
-                const result = await signInWithPopup(auth, provider);
-                showMessage(document.getElementById('login-message'), 
-                          `Google 로그인 성공! ${result.user.displayName}님`, 'success');
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                showMessage(messageDiv, `Google 로그인 성공! 환영합니다, ${user.displayName || user.email}님!`, 'success');
             } catch (error) {
-                handleAuthError(error, document.getElementById('login-message'));
+                handleAuthError(error, messageDiv);
             }
         });
 
-        // 전화번호 인증코드 발송
-        document.getElementById('send-otp-btn').addEventListener('click', async () => {
-            const phoneNumber = document.getElementById('phone-number').value;
-            try {
-                confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
-                document.getElementById('otp-verify-section').style.display = 'block';
-                showMessage(document.getElementById('login-message'), 
-                          '인증코드가 전송되었습니다.', 'success');
-            } catch (error) {
-                handleAuthError(error, document.getElementById('login-message'));
-            }
-        });
-
-        // 인증코드 확인
-        document.getElementById('verify-otp-btn').addEventListener('click', async () => {
-            const code = document.getElementById('verification-code').value;
-            try {
-                await confirmationResult.confirm(code);
-                showMessage(document.getElementById('login-message'), 
-                          '전화번호 인증 완료!', 'success');
-            } catch (error) {
-                handleAuthError(error, document.getElementById('login-message'));
-            }
-        });
-
-        // 이메일 링크 로그인 토글
-        document.getElementById('email-link-btn').addEventListener('click', () => {
-            const linkSection = document.getElementById('email-link-section');
-            linkSection.style.display = linkSection.style.display === 'none' ? 'block' : 'none';
-        });
-
-        // 이메일 링크 발송
-        document.getElementById('send-link-btn').addEventListener('click', async () => {
-            const email = document.getElementById('email-for-link').value;
-            const actionCodeSettings = {
-                url: window.location.href,
-                handleCodeInApp: true
-            };
-            try {
-                await sendSignInWithEmailLink(auth, email, actionCodeSettings);
-                localStorage.setItem('emailForSignIn', email);
-                showMessage(document.getElementById('login-message'), 
-                          '로그인 링크가 이메일로 전송되었습니다!', 'success');
-            } catch (error) {
-                handleAuthError(error, document.getElementById('login-message'));
-            }
-        });
-
-        // 이메일 링크 확인 (페이지 로드 시)
-        if (isSignInWithEmailLink(auth, window.location.href)) {
-            const email = localStorage.getItem('emailForSignIn');
-            if (email) {
-                signInWithEmailLink(auth, email, window.location.href)
-                    .then(() => {
-                        localStorage.removeItem('emailForSignIn');
-                        showMessage(document.getElementById('login-message'), 
-                                  '이메일 링크 로그인 성공!', 'success');
-                    })
-                    .catch((error) => {
-                        handleAuthError(error, document.getElementById('login-message'));
-                    });
-            }
-        }
-
-        // 기존 이메일/비밀번호 로그인 및 회원가입 기능 (변경 없음)
+        // Signup Form
         document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = e.target['signup-id'].value;
@@ -420,11 +346,7 @@
             const referralCode = e.target['referral-code'].value;
             const messageDiv = document.getElementById('signup-message');
             
-            if (referralCode === '6389') {
-                showMessage(messageDiv, '쁘띠유수 추천인 코드가 적용되었습니다.', 'success');
-            } else if (referralCode === '2028317') {
-                showMessage(messageDiv, '섹시유수 추천인 코드가 적용되었습니다.', 'success');
-            } else {
+            if (!['2028317', '6389'].includes(referralCode)) {
                 showMessage(messageDiv, '유효하지 않은 추천인 코드입니다.', 'error');
                 return;
             }
@@ -439,6 +361,7 @@
             }
         });
 
+        // Login Form
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = e.target['login-id'].value;
@@ -455,6 +378,7 @@
             }
         });
 
+        // Delete Account Button
         document.getElementById('delete-account-btn').addEventListener('click', async () => {
             const user = auth.currentUser;
             const messageDiv = document.getElementById('delete-message');
@@ -469,8 +393,10 @@
                 showMessage(messageDiv, '계정이 성공적으로 삭제되었습니다.', 'success');
                 updateUserUI(null);
             } catch (error) {
+                // 재인증이 필요한 경우
                 if (error.code === 'auth/requires-recent-login') {
                     showMessage(messageDiv, '계정 삭제를 위해 다시 로그인해주세요.', 'error');
+                    // 로그인 탭으로 이동
                     document.querySelector('.tab[data-tab="login"]').click();
                 } else {
                     handleAuthError(error, messageDiv);
@@ -478,9 +404,12 @@
             }
         });
 
-        // 공통 함수
-        onAuthStateChanged(auth, updateUserUI);
+        // Auth State Listener
+        onAuthStateChanged(auth, (user) => {
+            updateUserUI(user);
+        });
 
+        // Helper Functions
         function updateUserUI(user) {
             const currentUserInfo = document.getElementById('current-user-info');
             const notLoggedInMessage = document.getElementById('not-logged-in-message');
@@ -509,19 +438,14 @@
                 'auth/wrong-password': '비밀번호가 일치하지 않습니다.',
                 'auth/invalid-email': '유효하지 않은 아이디 형식입니다.',
                 'auth/weak-password': '비밀번호는 8자 이상이어야 합니다.',
-                'auth/invalid-phone-number': '유효하지 않은 전화번호 형식입니다.',
-                'auth/invalid-verification-code': '잘못된 인증코드입니다.',
-                'auth/captcha-check-failed': '보안 검증에 실패했습니다.',
-                'auth/credential-already-in-use': '이미 다른 방법으로 가입된 계정입니다.',
+                'auth/popup-closed-by-user': '로그인 창이 사용자에 의해 닫혔습니다.',
+                'auth/cancelled-popup-request': '로그인 요청이 취소되었습니다.',
                 'default': error.message
             };
             
             const message = messages[error.code] || messages['default'];
             showMessage(element, message, 'error');
         }
-
-        // 초기화
-        initializeRecaptcha();
     </script>
 </body>
 </html>
