@@ -295,12 +295,12 @@
             signInWithPopup
         } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
 
-        // Firebase Config - 실제 배포시 authDomain을 실제 도메인으로 변경해야 합니다
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBdzMBmsEGCETm3Tf7N-op5ANgsydjkMWc",
-            authDomain: window.location.hostname === 'localhost' ? 'localhost' : 'yourdomain.com', // 변경 필요
+            authDomain: "login-ddb0a.firebaseapp.com", // Firebase에서 자동으로 제공하는 도메인 사용
             projectId: "login-ddb0a",
-            storageBucket: "login-ddb0a.firebasestorage.app",
+            storageBucket: "login-ddb0a.appspot.com", // 수정된 스토리지 버킷 주소
             messagingSenderId: "722735085241",
             appId: "1:722735085241:web:9dde97154af644a4c1cd68",
             measurementId: "G-4B9B610VMH"
