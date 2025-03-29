@@ -130,6 +130,20 @@
             transform: translateY(-2px);
         }
         
+        .btn-guest {
+            background: #6c757d;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-guest:hover {
+            background: #5a6268;
+        }
+        
+        .btn-google {
+            background: #4285F4;
+            margin-bottom: 1rem;
+        }
+        
         .btn-danger {
             background: var(--error);
         }
@@ -181,11 +195,6 @@
         .divider span:nth-child(2) {
             padding: 0 1rem;
             color: #666;
-        }
-        
-        .btn-google {
-            background: #4285F4;
-            margin-bottom: 1rem;
         }
         
         .btn-icon {
@@ -362,26 +371,18 @@
         <div class="auth-container">
             <div class="tabs">
                 <div class="tab active" data-tab="login">로그인</div>
-                <div class="tab" data-tab="signup">회원가입</div>
                 <div class="tab" data-tab="delete">계정 삭제</div>
             </div>
             
             <div class="tab-content">
                 <div id="login" class="tab-pane active">
                     <div id="login-message" class="message hidden"></div>
-                    <form id="login-form">
-                        <div class="form-group">
-                            <label for="login-id">아이디</label>
-                            <input type="text" id="login-id" class="form-control" placeholder="아이디" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="login-password">비밀번호</label>
-                            <input type="password" id="login-password" class="form-control" placeholder="비밀번호" required>
-                        </div>
-                        <button type="submit" class="btn">로그인</button>
-                    </form>
-
+                    
                     <div class="social-login">
+                        <button id="guest-login-btn" class="btn btn-guest">
+                            Guest로 로그인
+                        </button>
+                        
                         <div class="divider">
                             <span></span>
                             <span>OR</span>
@@ -397,25 +398,6 @@
                             </span>
                         </button>
                     </div>
-                </div>
-                
-                <div id="signup" class="tab-pane">
-                    <div id="signup-message" class="message hidden"></div>
-                    <form id="signup-form">
-                        <div class="form-group">
-                            <label for="signup-id">아이디 (영문만)</label>
-                            <input type="text" id="signup-id" class="form-control" placeholder="영문 아이디" pattern="[A-Za-z]+" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="signup-password">비밀번호 (8자 이상)</label>
-                            <input type="password" id="signup-password" class="form-control" placeholder="8자 이상" minlength="8" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="referral-code">추천인 코드</label>
-                            <input type="text" id="referral-code" class="form-control" placeholder="추천인 코드를 입력하세요" required>
-                        </div>
-                        <button type="submit" class="btn">회원가입</button>
-                    </form>
                 </div>
                 
                 <div id="delete" class="tab-pane">
@@ -508,14 +490,9 @@
             measurementId: "G-MJB1NJH05M"
         };
 
-        // 허용된 추천인 코드
-        const ALLOWED_REFERRAL_CODES = ['4209', '2169493'];
-        const PETIT_REFERRAL_CODE = '4209';
-        const SEXY_REFERRAL_CODE = '2169493';
-
-        // 특수 접근 허용 계정
-        const SPECIAL_ACCESS_EMAIL = 'sexyyousoo68@gmail.com';
-        const SPECIAL_ACCESS_USERNAME = 'Yousoo';
+        // 특수 계정
+        const SPECIAL_ACCOUNT_1 = 'sexyyousoo68@gmail.com';
+        const SPECIAL_ACCOUNT_2 = 'shinyousoo68@gmail.com';
 
         // Firebase 초기화
         firebase.initializeApp(firebaseConfig);
@@ -526,10 +503,11 @@
         const gallerySection = document.getElementById('gallery-section');
         const logoutBtn = document.getElementById('logout-btn');
         const referralModal = document.getElementById('referral-modal');
+        const guestLoginBtn = document.getElementById('guest-login-btn');
 
-        // 사용자 추천인 코드 저장 변수
-        let userReferralCode = null;
-        let googleUser = null;
+        // 사용자 상태 변수
+        let currentUser = null;
+        let isGuest = false;
 
         // Tab Switching
         document.querySelectorAll('.tab').forEach(tab => {
@@ -542,6 +520,16 @@
             });
         });
 
+        // Guest 로그인 핸들러
+        guestLoginBtn.addEventListener('click', () => {
+            isGuest = true;
+            currentUser = {
+                email: 'guest@example.com',
+                isGuest: true
+            };
+            updateUI(currentUser);
+        });
+
         // Google 로그인 핸들러
         function setupGoogleLogin() {
             const googleLoginBtn = document.getElementById('google-login-btn');
@@ -552,102 +540,26 @@
             googleLoginBtn.addEventListener('click', async () => {
                 try {
                     const result = await auth.signInWithPopup(provider);
-                    googleUser = result.user;
+                    currentUser = result.user;
+                    isGuest = false;
                     
-                    // 로컬 스토리지에서 추천인 코드 확인
-                    const savedReferralCode = localStorage.getItem(`referralCode_${googleUser.uid}`);
-                    
-                    if (savedReferralCode) {
-                        // 이미 추천인 코드가 저장된 경우 바로 갤러리 표시
-                        userReferralCode = savedReferralCode;
-                        updateGalleryUI(googleUser, savedReferralCode);
+                    // 특수 계정인 경우 바로 갤러리 표시
+                    if (currentUser.email === SPECIAL_ACCOUNT_1 || currentUser.email === SPECIAL_ACCOUNT_2) {
+                        updateGalleryUI(currentUser);
                     } else {
-                        // 추천인 코드 입력 모달 표시
-                        referralModal.style.display = 'flex';
+                        // 일반 구글 계정은 Guest와 동일하게 처리
+                        isGuest = true;
+                        updateUI(currentUser);
                     }
                 } catch (error) {
                     handleAuthError(error, document.getElementById('login-message'));
                 }
             });
-            
-            submitReferralBtn.addEventListener('click', async () => {
-                const referralCode = modalReferralCode.value.trim();
-                
-                if (!ALLOWED_REFERRAL_CODES.includes(referralCode)) {
-                    showMessage(document.getElementById('referral-modal-message'), '유효하지 않은 추천인 코드입니다.', 'error');
-                    return;
-                }
-                
-                userReferralCode = referralCode;
-                
-                // 추천인 코드를 로컬 스토리지에 저장
-                if (googleUser) {
-                    localStorage.setItem(`referralCode_${googleUser.uid}`, referralCode);
-                }
-                
-                referralModal.style.display = 'none';
-                modalReferralCode.value = '';
-                
-                // 갤러리 UI 업데이트
-                updateGalleryUI(googleUser, referralCode);
-            });
         }
 
-        // 이메일/비밀번호 로그인 핸들러
-        function setupEmailLogin() {
-            const loginForm = document.getElementById('login-form');
-            const signupForm = document.getElementById('signup-form');
+        // 계정 삭제 핸들러
+        function setupAccountDeletion() {
             const deleteAccountBtn = document.getElementById('delete-account-btn');
-            
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const username = e.target['login-id'].value;
-                const password = e.target['login-password'].value;
-                const messageDiv = document.getElementById('login-message');
-                
-                try {
-                    const email = `${username}@yourdomain.com`;
-                    await auth.signInWithEmailAndPassword(email, password);
-                    
-                    // 이메일 로그인 시에는 회원가입 시 입력한 추천인 코드를 사용
-                    // (실제 구현에서는 DB에서 가져와야 하지만 여기서는 예시로 SEXY_REFERRAL_CODE 사용)
-                    userReferralCode = SEXY_REFERRAL_CODE;
-                    
-                    showMessage(messageDiv, `환영합니다, ${username}님!`, 'success');
-                    e.target.reset();
-                } catch (error) {
-                    handleAuthError(error, messageDiv);
-                }
-            });
-            
-            signupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const username = e.target['signup-id'].value;
-                const password = e.target['signup-password'].value;
-                const referralCode = e.target['referral-code'].value;
-                const messageDiv = document.getElementById('signup-message');
-                
-                if (!ALLOWED_REFERRAL_CODES.includes(referralCode)) {
-                    showMessage(messageDiv, '유효하지 않은 추천인 코드입니다.', 'error');
-                    return;
-                }
-                
-                try {
-                    const email = `${username}@yourdomain.com`;
-                    await auth.createUserWithEmailAndPassword(email, password);
-                    
-                    // 회원가입 시 추천인 코드 저장
-                    userReferralCode = referralCode;
-                    
-                    showMessage(messageDiv, '회원가입 성공! 로그인해주세요.', 'success');
-                    e.target.reset();
-                    
-                    // 회원가입 후 로그인 탭으로 전환
-                    document.querySelector('.tab[data-tab="login"]').click();
-                } catch (error) {
-                    handleAuthError(error, messageDiv);
-                }
-            });
             
             deleteAccountBtn.addEventListener('click', async () => {
                 const user = auth.currentUser;
@@ -660,8 +572,6 @@
                 
                 try {
                     await user.delete();
-                    // 로컬 스토리지에서 추천인 코드 삭제
-                    localStorage.removeItem(`referralCode_${user.uid}`);
                     showMessage(messageDiv, '계정이 성공적으로 삭제되었습니다.', 'success');
                     updateUI(null);
                 } catch (error) {
@@ -677,45 +587,49 @@
 
         // 로그아웃 핸들러
         logoutBtn.addEventListener('click', () => {
-            auth.signOut().then(() => {
+            if (isGuest) {
+                // Guest 로그아웃
+                currentUser = null;
+                isGuest = false;
                 updateUI(null);
-            }).catch((error) => {
-                console.error('로그아웃 오류:', error);
-            });
+            } else {
+                // Google 계정 로그아웃
+                auth.signOut().then(() => {
+                    currentUser = null;
+                    updateUI(null);
+                }).catch((error) => {
+                    console.error('로그아웃 오류:', error);
+                });
+            }
         });
 
         // 갤러리 UI 업데이트 함수
-        function updateGalleryUI(user, referralCode) {
+        function updateGalleryUI(user) {
             const diaryBtn = document.getElementById('diary');
             const noteBtn = document.getElementById('note');
             const ssulBtn = document.getElementById('ssul');
             const cuttoonBtn = document.getElementById('cuttoon');
             const secretBtn = document.getElementById('secret-btn');
+            const travelBtn = document.getElementById('travel');
             const diyBtn = document.getElementById('diy');
             
             // 모든 버튼 초기화
-            [diaryBtn, noteBtn, ssulBtn, cuttoonBtn, secretBtn, diyBtn].forEach(btn => {
+            [diaryBtn, noteBtn, ssulBtn, cuttoonBtn, secretBtn, travelBtn, diyBtn].forEach(btn => {
                 btn.classList.remove('disabled');
             });
             diyBtn.style.display = 'flex';
             
-            // 쁘띠유수 추천인으로 가입한 경우
-            if (referralCode === PETIT_REFERRAL_CODE) {
+            if (isGuest || (user && user.email !== SPECIAL_ACCOUNT_1 && user.email !== SPECIAL_ACCOUNT_2)) {
+                // Guest 또는 일반 구글 계정인 경우
                 [diaryBtn, noteBtn, ssulBtn, cuttoonBtn, secretBtn].forEach(btn => {
                     btn.classList.add('disabled');
                 });
                 diyBtn.style.display = 'none';
-            } 
-            // 섹시유수 추천인으로 가입한 경우
-            else if (referralCode === SEXY_REFERRAL_CODE) {
+            } else if (user && user.email === SPECIAL_ACCOUNT_2) {
+                // shinyousoo68@gmail.com 계정인 경우
                 secretBtn.classList.add('disabled');
             }
-            
-            // 특수 계정 확인 (비밀 썰 비밀번호 모음 버튼 활성화)
-            if (user.email === SPECIAL_ACCESS_EMAIL || 
-                (user.email && user.email.startsWith(SPECIAL_ACCESS_USERNAME + '@'))) {
-                secretBtn.classList.remove('disabled');
-            }
+            // sexyousoo68@gmail.com 계정은 모든 버튼 활성화
             
             // 갤러리 표시
             authSection.style.display = 'none';
@@ -728,29 +642,19 @@
             const notLoggedInMessage = document.getElementById('not-logged-in-message');
             const currentUserEmail = document.getElementById('current-user-email');
             
-            if (user) {
+            if (user || currentUser) {
                 // 로그인 상태
                 currentUserInfo.classList.remove('hidden');
                 notLoggedInMessage.classList.add('hidden');
-                currentUserEmail.textContent = user.email || '이메일 정보 없음';
                 
-                // 구글 로그인인 경우
-                if (user.providerData && user.providerData.some(provider => provider.providerId === 'google.com')) {
-                    // 로컬 스토리지에서 추천인 코드 확인
-                    const savedReferralCode = localStorage.getItem(`referralCode_${user.uid}`);
-                    
-                    if (savedReferralCode) {
-                        // 이미 추천인 코드가 저장된 경우 바로 갤러리 표시
-                        userReferralCode = savedReferralCode;
-                        updateGalleryUI(user, savedReferralCode);
-                    } else {
-                        // 추천인 코드 입력 모달 표시
-                        referralModal.style.display = 'flex';
-                    }
+                if (isGuest) {
+                    currentUserEmail.textContent = 'Guest 계정';
                 } else {
-                    // 이메일 로그인인 경우 갤러리 바로 표시
-                    updateGalleryUI(user, userReferralCode || SEXY_REFERRAL_CODE);
+                    currentUserEmail.textContent = user ? user.email : '이메일 정보 없음';
                 }
+                
+                // 갤러리 UI 업데이트
+                updateGalleryUI(user || currentUser);
             } else {
                 // 로그아웃 상태
                 authSection.style.display = 'block';
@@ -761,8 +665,8 @@
                 notLoggedInMessage.classList.remove('hidden');
                 
                 // 변수 초기화
-                userReferralCode = null;
-                googleUser = null;
+                currentUser = null;
+                isGuest = false;
             }
         }
 
@@ -798,6 +702,10 @@
         // 인증 상태 리스너
         function setupAuthStateListener() {
             auth.onAuthStateChanged((user) => {
+                if (user) {
+                    currentUser = user;
+                    isGuest = false;
+                }
                 updateUI(user);
             });
         }
@@ -805,7 +713,7 @@
         // 초기화 함수 실행
         document.addEventListener('DOMContentLoaded', () => {
             setupGoogleLogin();
-            setupEmailLogin();
+            setupAccountDeletion();
             setupAuthStateListener();
         });
     </script>
