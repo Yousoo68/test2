@@ -16,7 +16,6 @@
             --radius: 8px;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
-            --google-red: #DB4437;
         }
         
         * {
@@ -34,12 +33,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
         
         .container {
             width: 100%;
             max-width: 500px;
+            padding: 2rem;
         }
         
         .auth-container {
@@ -123,10 +122,6 @@
             cursor: pointer;
             transition: var(--transition);
             width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
         
         .btn:hover {
@@ -140,46 +135,6 @@
         
         .btn-danger:hover {
             background: #d62c2c;
-        }
-
-        .btn-google {
-            background: white;
-            color: var(--dark);
-            border: 1px solid #ddd;
-            margin-top: 1rem;
-        }
-
-        .btn-google:hover {
-            background: #f8f9fa;
-            transform: translateY(-2px);
-        }
-
-        .google-icon {
-            width: 18px;
-            height: 18px;
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 1.5rem 0;
-            color: #777;
-            font-size: 0.9rem;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: "";
-            flex: 1;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .divider::before {
-            margin-right: 1rem;
-        }
-
-        .divider::after {
-            margin-left: 1rem;
         }
         
         .message {
@@ -204,9 +159,80 @@
         .current-user-info p {
             margin-bottom: 0.5rem;
         }
+
+        /* 소셜 로그인 스타일 추가 */
+        .social-login {
+            margin-top: 1.5rem;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+        
+        .divider span:first-child,
+        .divider span:last-child {
+            flex-grow: 1;
+            height: 1px;
+            background: #ddd;
+        }
+        
+        .divider span:nth-child(2) {
+            padding: 0 1rem;
+            color: #666;
+        }
+        
+        .btn-google {
+            background: #4285F4;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-phone {
+            background: #34B7F1;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-cross-device {
+            background: #6c5ce7;
+        }
+        
+        .btn-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-icon svg {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+        }
+        
+        /* 전화번호 인증 컨테이너 */
+        #phone-auth-container,
+        #cross-device-container {
+            display: none;
+            margin-top: 1.5rem;
+        }
+        
+        /* QR 코드 스타일 */
+        #qr-code {
+            margin: 0 auto 1.5rem;
+            width: 200px;
+            height: 200px;
+        }
+        
+        #cross-device-link {
+            word-break: break-all;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
         
         @media (max-width: 768px) {
-            .container { padding: 0; }
+            .container { padding: 1rem; }
             .tab-content { padding: 1.5rem; }
         }
     </style>
@@ -234,16 +260,75 @@
                             <input type="password" id="login-password" class="form-control" placeholder="비밀번호" required>
                         </div>
                         <button type="submit" class="btn">로그인</button>
-
-                        <div class="divider">또는</div>
-
-                        <button type="button" id="google-login-btn" class="btn btn-google">
-                            <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
-                                <path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/>
-                            </svg>
-                            Google로 로그인
-                        </button>
                     </form>
+
+                    <!-- 소셜 로그인 섹션 -->
+                    <div class="social-login">
+                        <div class="divider">
+                            <span></span>
+                            <span>OR</span>
+                            <span></span>
+                        </div>
+                        
+                        <button id="google-login-btn" class="btn btn-google">
+                            <span class="btn-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+                                    <path fill="white" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/>
+                                </svg>
+                                Google로 로그인
+                            </span>
+                        </button>
+                        
+                        <button id="phone-login-btn" class="btn btn-phone">
+                            <span class="btn-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="white" d="M511.2 387l-23.25 100.8c-3.266 14.25-15.79 24.22-30.46 24.22C205.2 512 0 306.8 0 54.5c0-14.66 9.969-27.2 24.22-30.45l100.8-23.25C139.7-2.602 154.7 5.018 160.8 18.92l46.52 108.5c5.438 12.78 1.77 27.67-8.98 36.45L144.5 207.1c33.98 69.22 90.26 125.5 159.5 159.5l44.08-53.8c8.688-10.78 23.69-14.51 36.47-8.975l108.5 46.51C506.1 357.2 514.6 372.4 511.2 387z"/>
+                                </svg>
+                                전화번호로 로그인
+                            </span>
+                        </button>
+                        
+                        <button id="cross-device-btn" class="btn btn-cross-device">
+                            <span class="btn-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                    <path fill="white" d="M128 96h384v256h64v-272c0-26.38-21.62-48-48-48h-416c-26.38 0-48 21.62-48 48V352h64V96zM624 383.1h-608c-8.75 0-16 7.25-16 16v16c0 35.25 28.75 64 64 64h512c35.25 0 64-28.75 64-64v-16C640 391.2 632.8 383.1 624 383.1z"/>
+                                </svg>
+                                다른 기기로 로그인
+                            </span>
+                        </button>
+                    </div>
+                    
+                    <!-- 전화번호 인증 UI -->
+                    <div id="phone-auth-container">
+                        <div class="form-group">
+                            <label for="phone-number">전화번호 (+82로 시작)</label>
+                            <input type="tel" id="phone-number" class="form-control" placeholder="+821012345678" required>
+                        </div>
+                        <button id="send-verification" class="btn btn-phone">인증번호 전송</button>
+                        
+                        <div id="verification-code-container" style="display: none; margin-top: 1rem;">
+                            <div class="form-group">
+                                <label for="verification-code">인증번호</label>
+                                <input type="text" id="verification-code" class="form-control" placeholder="6자리 숫자" required>
+                            </div>
+                            <button id="verify-code" class="btn btn-phone">인증 확인</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 크로스 디바이스 UI -->
+                    <div id="cross-device-container">
+                        <h3 style="margin-bottom: 1rem;">다른 기기에서 로그인</h3>
+                        <p style="margin-bottom: 1.5rem;">아래 QR 코드를 스캔하거나 링크를 열어 로그인을 완료해주세요</p>
+                        
+                        <div id="qr-code"></div>
+                        
+                        <div id="cross-device-link"></div>
+                        
+                        <button id="copy-link-btn" class="btn btn-cross-device" style="margin-bottom: 1rem;">링크 복사</button>
+                        <button id="cancel-cross-device" class="btn btn-danger">취소</button>
+                    </div>
+                    
+                    <div id="recaptcha-container"></div>
                 </div>
                 
                 <!-- Signup Tab -->
@@ -282,35 +367,47 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-analytics.js";
         import { 
             getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            signInWithPhoneNumber,
+            RecaptchaVerifier,
+            onAuthStateChanged,
+            signOut,
+            isSignInWithEmailLink,
+            signInWithEmailLink,
+            sendSignInLinkToEmail,
             createUserWithEmailAndPassword, 
             signInWithEmailAndPassword,
-            onAuthStateChanged,
             deleteUser,
-            GoogleAuthProvider,
-            signInWithPopup
+            reauthenticateWithCredential,
+            EmailAuthProvider
         } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+        
+        import { 
+            getDynamicLinks, 
+            onDynamicLink 
+        } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-dynamic-links.js";
 
-        // Firebase Config
+        // Firebase 구성
         const firebaseConfig = {
-            apiKey: "AIzaSyBdzMBmsEGCETm3Tf7N-op5ANgsydjkMWc",
-            authDomain: "login-ddb0a.firebaseapp.com", // Firebase에서 자동으로 제공하는 도메인 사용
-            projectId: "login-ddb0a",
-            storageBucket: "login-ddb0a.appspot.com", // 수정된 스토리지 버킷 주소
-            messagingSenderId: "722735085241",
-            appId: "1:722735085241:web:9dde97154af644a4c1cd68",
-            measurementId: "G-4B9B610VMH"
+            apiKey: "AIzaSyClivXSor5P8XJHw1rWYsVfxt8iU6_NgBA",
+            authDomain: "login-34bef.firebaseapp.com",
+            projectId: "login-34bef",
+            storageBucket: "login-34bef.firebasestorage.app",
+            messagingSenderId: "888738257773",
+            appId: "1:888738257773:web:b1c5a99b41996c3ac2d864",
+            measurementId: "G-MJB1NJH05M"
         };
 
-        // Initialize Firebase
+        // Firebase 초기화
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const auth = getAuth(app);
-        const googleProvider = new GoogleAuthProvider();
 
         // Tab Switching
         document.querySelectorAll('.tab').forEach(tab => {
@@ -320,93 +417,280 @@
                 
                 tab.classList.add('active');
                 document.getElementById(tab.dataset.tab).classList.add('active');
+                
+                // 전화번호 인증 UI 숨기기
+                document.getElementById('phone-auth-container').style.display = 'none';
+                document.getElementById('cross-device-container').style.display = 'none';
             });
         });
 
-        // Google Login
-        document.getElementById('google-login-btn').addEventListener('click', async () => {
-            const messageDiv = document.getElementById('login-message');
+        // Google 로그인 핸들러
+        function setupGoogleLogin() {
+            const googleLoginBtn = document.getElementById('google-login-btn');
+            const provider = new GoogleAuthProvider();
             
-            try {
-                const result = await signInWithPopup(auth, googleProvider);
-                const user = result.user;
-                showMessage(messageDiv, `Google 로그인 성공! 환영합니다, ${user.displayName || user.email}님!`, 'success');
-            } catch (error) {
-                console.error("Google 로그인 에러:", error);
-                handleAuthError(error, messageDiv);
-            }
-        });
+            googleLoginBtn.addEventListener('click', async () => {
+                try {
+                    const result = await signInWithPopup(auth, provider);
+                    showMessage(document.getElementById('login-message'), `Google 로그인 성공! ${result.user.displayName}님 환영합니다.`, 'success');
+                } catch (error) {
+                    handleAuthError(error, document.getElementById('login-message'));
+                }
+            });
+        }
 
-        // Signup Form
-        document.getElementById('signup-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = e.target['signup-id'].value;
-            const password = e.target['signup-password'].value;
-            const referralCode = e.target['referral-code'].value;
-            const messageDiv = document.getElementById('signup-message');
+        // 전화번호 로그인 핸들러
+        function setupPhoneLogin() {
+            const phoneLoginBtn = document.getElementById('phone-login-btn');
+            const phoneAuthContainer = document.getElementById('phone-auth-container');
+            const sendVerificationBtn = document.getElementById('send-verification');
+            const verifyCodeBtn = document.getElementById('verify-code');
+            const verificationCodeContainer = document.getElementById('verification-code-container');
             
-            if (!['2028317', '6389'].includes(referralCode)) {
-                showMessage(messageDiv, '유효하지 않은 추천인 코드입니다.', 'error');
-                return;
-            }
+            let confirmationResult;
+            let recaptchaVerifier;
             
-            try {
-                const email = `${username}@yourdomain.com`;
-                await createUserWithEmailAndPassword(auth, email, password);
-                showMessage(messageDiv, '회원가입 성공! 로그인해주세요.', 'success');
-                e.target.reset();
-            } catch (error) {
-                handleAuthError(error, messageDiv);
+            phoneLoginBtn.addEventListener('click', () => {
+                phoneAuthContainer.style.display = 'block';
+                document.getElementById('cross-device-container').style.display = 'none';
+                initializeRecaptcha();
+            });
+            
+            sendVerificationBtn.addEventListener('click', async () => {
+                const phoneNumber = document.getElementById('phone-number').value;
+                
+                if (!phoneNumber.startsWith('+82')) {
+                    showMessage(document.getElementById('login-message'), '한국 번호는 +82로 시작해야 합니다 (예: +821012345678)', 'error');
+                    return;
+                }
+                
+                try {
+                    confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+                    verificationCodeContainer.style.display = 'block';
+                    showMessage(document.getElementById('login-message'), '인증번호가 전송되었습니다. SMS를 확인해주세요.', 'success');
+                } catch (error) {
+                    handleAuthError(error, document.getElementById('login-message'));
+                }
+            });
+            
+            verifyCodeBtn.addEventListener('click', async () => {
+                const verificationCode = document.getElementById('verification-code').value;
+                
+                try {
+                    await confirmationResult.confirm(verificationCode);
+                    phoneAuthContainer.style.display = 'none';
+                    showMessage(document.getElementById('login-message'), '전화번호 인증이 완료되었습니다!', 'success');
+                } catch (error) {
+                    handleAuthError(error, document.getElementById('login-message'));
+                }
+            });
+            
+            function initializeRecaptcha() {
+                if (recaptchaVerifier) return;
+                
+                recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+                    size: 'invisible',
+                    callback: () => {}
+                }, auth);
             }
-        });
+        }
 
-        // Login Form
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = e.target['login-id'].value;
-            const password = e.target['login-password'].value;
-            const messageDiv = document.getElementById('login-message');
+        // 크로스 디바이스 로그인 핸들러
+        function setupCrossDeviceLogin() {
+            const crossDeviceBtn = document.getElementById('cross-device-btn');
+            const crossDeviceContainer = document.getElementById('cross-device-container');
+            const copyLinkBtn = document.getElementById('copy-link-btn');
+            const cancelCrossDeviceBtn = document.getElementById('cancel-cross-device');
             
-            try {
-                const email = `${username}@yourdomain.com`;
-                await signInWithEmailAndPassword(auth, email, password);
-                showMessage(messageDiv, `환영합니다, ${username}님!`, 'success');
-                e.target.reset();
-            } catch (error) {
-                handleAuthError(error, messageDiv);
+            let crossDeviceTimeout;
+            const CROSS_DEVICE_TIMEOUT = 5 * 60 * 1000; // 5분
+            
+            crossDeviceBtn.addEventListener('click', () => {
+                crossDeviceContainer.style.display = 'block';
+                document.getElementById('phone-auth-container').style.display = 'none';
+                generateCrossDeviceLink();
+            });
+            
+            copyLinkBtn.addEventListener('click', () => {
+                const link = document.getElementById('cross-device-link').textContent;
+                navigator.clipboard.writeText(link)
+                    .then(() => showMessage(document.getElementById('login-message'), '링크가 복사되었습니다!', 'success'))
+                    .catch(() => prompt('링크를 복사해주세요', link));
+            });
+            
+            cancelCrossDeviceBtn.addEventListener('click', () => {
+                resetCrossDeviceUI();
+            });
+            
+            // 동적 링크 리스너 설정
+            if (typeof firebase !== 'undefined' && firebase.dynamicLinks) {
+                firebase.dynamicLinks().onLink(handleDynamicLink);
+                firebase.dynamicLinks().getInitialLink()
+                    .then(handleDynamicLink)
+                    .catch(error => {
+                        console.error('동적 링크 처리 오류:', error);
+                    });
             }
-        });
-
-        // Delete Account Button
-        document.getElementById('delete-account-btn').addEventListener('click', async () => {
-            const user = auth.currentUser;
-            const messageDiv = document.getElementById('delete-message');
             
-            if (!user) {
-                showMessage(messageDiv, '로그인이 필요합니다.', 'error');
-                return;
-            }
-            
-            try {
-                await deleteUser(user);
-                showMessage(messageDiv, '계정이 성공적으로 삭제되었습니다.', 'success');
-                updateUserUI(null);
-            } catch (error) {
-                if (error.code === 'auth/requires-recent-login') {
-                    showMessage(messageDiv, '계정 삭제를 위해 다시 로그인해주세요.', 'error');
-                    document.querySelector('.tab[data-tab="login"]').click();
-                } else {
-                    handleAuthError(error, messageDiv);
+            async function generateCrossDeviceLink() {
+                try {
+                    const email = `cross-device-${Date.now()}@temp.com`;
+                    const actionCodeSettings = {
+                        url: `https://${window.location.hostname}/complete-login`,
+                        handleCodeInApp: true
+                    };
+                    
+                    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+                    
+                    const dynamicLinkDomain = 'login-34bef.page.link'; // Firebase 콘솔에서 확인
+                    const dynamicLink = await firebase.dynamicLinks().createShortLink({
+                        link: `https://${window.location.hostname}/complete-login?provider=cross-device`,
+                        domainUriPrefix: `https://${dynamicLinkDomain}`,
+                        androidInfo: {
+                            androidPackageName: 'com.example.android',
+                        },
+                        iosInfo: {
+                            iosBundleId: 'com.example.ios',
+                        },
+                        socialMetaTagInfo: {
+                            socialTitle: '로그인을 완료해주세요',
+                            socialDescription: '다른 기기에서 로그인을 완료하세요',
+                        },
+                    });
+                    
+                    // QR 코드 생성
+                    if (window.QRCode) {
+                        document.getElementById('qr-code').innerHTML = '';
+                        new QRCode(document.getElementById('qr-code'), {
+                            text: dynamicLink.shortLink,
+                            width: 200,
+                            height: 200
+                        });
+                    }
+                    
+                    document.getElementById('cross-device-link').textContent = dynamicLink.shortLink;
+                    
+                    // 타임아웃 설정
+                    crossDeviceTimeout = setTimeout(() => {
+                        showMessage(document.getElementById('login-message'), '로그인 시간이 만료되었습니다. 다시 시도해주세요.', 'error');
+                        resetCrossDeviceUI();
+                    }, CROSS_DEVICE_TIMEOUT);
+                    
+                } catch (error) {
+                    handleAuthError(error, document.getElementById('login-message'));
+                    resetCrossDeviceUI();
                 }
             }
-        });
+            
+            function handleDynamicLink(link) {
+                if (!link || !link.url) return;
+                
+                if (isSignInWithEmailLink(auth, link.url)) {
+                    let email = window.localStorage.getItem('emailForSignIn');
+                    
+                    if (!email) {
+                        email = window.prompt('이메일을 입력해주세요:');
+                    }
+                    
+                    signInWithEmailLink(auth, email, link.url)
+                        .then(() => {
+                            window.localStorage.removeItem('emailForSignIn');
+                            showMessage(document.getElementById('login-message'), '다른 기기에서 로그인이 완료되었습니다!', 'success');
+                        })
+                        .catch(error => {
+                            handleAuthError(error, document.getElementById('login-message'));
+                        });
+                }
+            }
+            
+            function resetCrossDeviceUI() {
+                if (crossDeviceTimeout) {
+                    clearTimeout(crossDeviceTimeout);
+                    crossDeviceTimeout = null;
+                }
+                crossDeviceContainer.style.display = 'none';
+            }
+        }
 
-        // Auth State Listener
-        onAuthStateChanged(auth, (user) => {
-            updateUserUI(user);
-        });
+        // 이메일/비밀번호 로그인 핸들러
+        function setupEmailLogin() {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const deleteAccountBtn = document.getElementById('delete-account-btn');
+            
+            // 로그인 폼
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = e.target['login-id'].value;
+                const password = e.target['login-password'].value;
+                const messageDiv = document.getElementById('login-message');
+                
+                try {
+                    const email = `${username}@yourdomain.com`;
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showMessage(messageDiv, `환영합니다, ${username}님!`, 'success');
+                    e.target.reset();
+                } catch (error) {
+                    handleAuthError(error, messageDiv);
+                }
+            });
+            
+            // 회원가입 폼
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = e.target['signup-id'].value;
+                const password = e.target['signup-password'].value;
+                const referralCode = e.target['referral-code'].value;
+                const messageDiv = document.getElementById('signup-message');
+                
+                if (!['2028317', '6389'].includes(referralCode)) {
+                    showMessage(messageDiv, '유효하지 않은 추천인 코드입니다.', 'error');
+                    return;
+                }
+                
+                try {
+                    const email = `${username}@yourdomain.com`;
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    showMessage(messageDiv, '회원가입 성공! 로그인해주세요.', 'success');
+                    e.target.reset();
+                } catch (error) {
+                    handleAuthError(error, messageDiv);
+                }
+            });
+            
+            // 계정 삭제
+            deleteAccountBtn.addEventListener('click', async () => {
+                const user = auth.currentUser;
+                const messageDiv = document.getElementById('delete-message');
+                
+                if (!user) {
+                    showMessage(messageDiv, '로그인이 필요합니다.', 'error');
+                    return;
+                }
+                
+                try {
+                    await deleteUser(user);
+                    showMessage(messageDiv, '계정이 성공적으로 삭제되었습니다.', 'success');
+                    updateUserUI(null);
+                } catch (error) {
+                    if (error.code === 'auth/requires-recent-login') {
+                        showMessage(messageDiv, '계정 삭제를 위해 다시 로그인해주세요.', 'error');
+                        document.querySelector('.tab[data-tab="login"]').click();
+                    } else {
+                        handleAuthError(error, messageDiv);
+                    }
+                }
+            });
+        }
 
-        // Helper Functions
+        // 인증 상태 리스너
+        function setupAuthStateListener() {
+            onAuthStateChanged(auth, (user) => {
+                updateUserUI(user);
+            });
+        }
+
+        // 사용자 UI 업데이트
         function updateUserUI(user) {
             const currentUserInfo = document.getElementById('current-user-info');
             const notLoggedInMessage = document.getElementById('not-logged-in-message');
@@ -422,10 +706,18 @@
             }
         }
 
+        // 공통 함수들
         function showMessage(element, text, type) {
+            if (!element) return;
+            
             element.textContent = text;
             element.className = `message ${type}`;
             element.classList.remove('hidden');
+            
+            // 5초 후 메시지 숨기기
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 5000);
         }
 
         function handleAuthError(error, element) {
@@ -435,15 +727,28 @@
                 'auth/wrong-password': '비밀번호가 일치하지 않습니다.',
                 'auth/invalid-email': '유효하지 않은 아이디 형식입니다.',
                 'auth/weak-password': '비밀번호는 8자 이상이어야 합니다.',
-                'auth/popup-closed-by-user': '로그인 창이 사용자에 의해 닫혔습니다.',
-                'auth/cancelled-popup-request': '로그인 요청이 취소되었습니다.',
-                'auth/unauthorized-domain': '현재 도메인에서 로그인이 허용되지 않습니다. 관리자에게 문의하세요.',
+                'auth/invalid-phone-number': '유효하지 않은 전화번호 형식입니다.',
+                'auth/captcha-check-failed': 'reCAPTCHA 확인에 실패했습니다.',
+                'auth/invalid-verification-code': '잘못된 인증번호입니다.',
+                'auth/credential-already-in-use': '이미 사용 중인 계정입니다.',
+                'auth/operation-not-supported-in-this-environment': '현재 환경에서는 이 작업을 지원하지 않습니다.',
+                'auth/too-many-requests': '너무 많은 시도가 있었습니다. 나중에 다시 시도해주세요.',
                 'default': error.message
             };
             
             const message = messages[error.code] || messages['default'];
             showMessage(element, message, 'error');
+            console.error('인증 오류:', error);
         }
+
+        // 초기화 함수 실행
+        document.addEventListener('DOMContentLoaded', () => {
+            setupGoogleLogin();
+            setupPhoneLogin();
+            setupCrossDeviceLogin();
+            setupEmailLogin();
+            setupAuthStateListener();
+        });
     </script>
 </body>
 </html>
