@@ -188,15 +188,6 @@
             margin-bottom: 1rem;
         }
         
-        .btn-phone {
-            background: #34B7F1;
-            margin-bottom: 1rem;
-        }
-        
-        .btn-cross-device {
-            background: #6c5ce7;
-        }
-        
         .btn-icon {
             display: flex;
             align-items: center;
@@ -208,27 +199,35 @@
             height: 18px;
             margin-right: 8px;
         }
-        
-        /* 전화번호 인증 컨테이너 */
-        #phone-auth-container,
-        #cross-device-container {
+
+        /* 모달 스타일 추가 */
+        .modal {
             display: none;
-            margin-top: 1.5rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
         
-        /* QR 코드 스타일 */
-        #qr-code {
-            margin: 0 auto 1.5rem;
-            width: 200px;
-            height: 200px;
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--shadow);
         }
         
-        #cross-device-link {
-            word-break: break-all;
+        .modal-title {
             margin-bottom: 1.5rem;
-            padding: 0.5rem;
-            background: #f5f5f5;
-            border-radius: 4px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
         }
         
         @media (max-width: 768px) {
@@ -278,57 +277,7 @@
                                 Google로 로그인
                             </span>
                         </button>
-                        
-                        <button id="phone-login-btn" class="btn btn-phone">
-                            <span class="btn-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                                    <path fill="white" d="M511.2 387l-23.25 100.8c-3.266 14.25-15.79 24.22-30.46 24.22C205.2 512 0 306.8 0 54.5c0-14.66 9.969-27.2 24.22-30.45l100.8-23.25C139.7-2.602 154.7 5.018 160.8 18.92l46.52 108.5c5.438 12.78 1.77 27.67-8.98 36.45L144.5 207.1c33.98 69.22 90.26 125.5 159.5 159.5l44.08-53.8c8.688-10.78 23.69-14.51 36.47-8.975l108.5 46.51C506.1 357.2 514.6 372.4 511.2 387z"/>
-                                </svg>
-                                전화번호로 로그인
-                            </span>
-                        </button>
-                        
-                        <button id="cross-device-btn" class="btn btn-cross-device">
-                            <span class="btn-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
-                                    <path fill="white" d="M128 96h384v256h64v-272c0-26.38-21.62-48-48-48h-416c-26.38 0-48 21.62-48 48V352h64V96zM624 383.1h-608c-8.75 0-16 7.25-16 16v16c0 35.25 28.75 64 64 64h512c35.25 0 64-28.75 64-64v-16C640 391.2 632.8 383.1 624 383.1z"/>
-                                </svg>
-                                다른 기기로 로그인
-                            </span>
-                        </button>
                     </div>
-                    
-                    <!-- 전화번호 인증 UI -->
-                    <div id="phone-auth-container">
-                        <div class="form-group">
-                            <label for="phone-number">전화번호 (+82로 시작)</label>
-                            <input type="tel" id="phone-number" class="form-control" placeholder="+821012345678" required>
-                        </div>
-                        <button id="send-verification" class="btn btn-phone">인증번호 전송</button>
-                        
-                        <div id="verification-code-container" style="display: none; margin-top: 1rem;">
-                            <div class="form-group">
-                                <label for="verification-code">인증번호</label>
-                                <input type="text" id="verification-code" class="form-control" placeholder="6자리 숫자" required>
-                            </div>
-                            <button id="verify-code" class="btn btn-phone">인증 확인</button>
-                        </div>
-                    </div>
-                    
-                    <!-- 크로스 디바이스 UI -->
-                    <div id="cross-device-container">
-                        <h3 style="margin-bottom: 1rem;">다른 기기에서 로그인</h3>
-                        <p style="margin-bottom: 1.5rem;">아래 QR 코드를 스캔하거나 링크를 열어 로그인을 완료해주세요</p>
-                        
-                        <div id="qr-code"></div>
-                        
-                        <div id="cross-device-link"></div>
-                        
-                        <button id="copy-link-btn" class="btn btn-cross-device" style="margin-bottom: 1rem;">링크 복사</button>
-                        <button id="cancel-cross-device" class="btn btn-danger">취소</button>
-                    </div>
-                    
-                    <div id="recaptcha-container"></div>
                 </div>
                 
                 <!-- Signup Tab -->
@@ -367,11 +316,22 @@
         </div>
     </div>
 
-    <!-- Firebase SDK 및 QR 코드 라이브러리 -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <!-- 추천인 코드 입력 모달 -->
+    <div id="referral-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">추천인 코드 입력</h3>
+            <div id="referral-modal-message" class="message hidden"></div>
+            <div class="form-group">
+                <label for="modal-referral-code">추천인 코드</label>
+                <input type="text" id="modal-referral-code" class="form-control" placeholder="2028317 또는 6389" required>
+            </div>
+            <button id="submit-referral-btn" class="btn">확인</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-dynamic-links.js"></script>
 
     <script>
         // Firebase 구성
@@ -397,10 +357,6 @@
                 
                 tab.classList.add('active');
                 document.getElementById(tab.dataset.tab).classList.add('active');
-                
-                // 전화번호 인증 UI 숨기기
-                document.getElementById('phone-auth-container').style.display = 'none';
-                document.getElementById('cross-device-container').style.display = 'none';
             });
         });
 
@@ -408,109 +364,41 @@
         function setupGoogleLogin() {
             const googleLoginBtn = document.getElementById('google-login-btn');
             const provider = new firebase.auth.GoogleAuthProvider();
+            const referralModal = document.getElementById('referral-modal');
+            const submitReferralBtn = document.getElementById('submit-referral-btn');
+            const modalReferralCode = document.getElementById('modal-referral-code');
+            const referralModalMessage = document.getElementById('referral-modal-message');
+            
+            let googleUser = null;
             
             googleLoginBtn.addEventListener('click', async () => {
                 try {
                     const result = await auth.signInWithPopup(provider);
-                    showMessage(document.getElementById('login-message'), `Google 로그인 성공! ${result.user.displayName || '사용자'}님 환영합니다.`, 'success');
+                    googleUser = result.user;
+                    
+                    // 추천인 코드 입력 모달 표시
+                    referralModal.style.display = 'flex';
                 } catch (error) {
                     handleAuthError(error, document.getElementById('login-message'));
                 }
             });
-        }
-
-        // 전화번호 로그인 핸들러
-        function setupPhoneLogin() {
-            const phoneLoginBtn = document.getElementById('phone-login-btn');
-            const phoneAuthContainer = document.getElementById('phone-auth-container');
-            const sendVerificationBtn = document.getElementById('send-verification');
-            const verifyCodeBtn = document.getElementById('verify-code');
-            const verificationCodeContainer = document.getElementById('verification-code-container');
             
-            let confirmationResult;
-            let recaptchaVerifier;
-            
-            phoneLoginBtn.addEventListener('click', () => {
-                phoneAuthContainer.style.display = 'block';
-                document.getElementById('cross-device-container').style.display = 'none';
-                initializeRecaptcha();
-            });
-            
-            sendVerificationBtn.addEventListener('click', async () => {
-                const phoneNumber = document.getElementById('phone-number').value;
+            // 추천인 코드 확인 버튼 클릭
+            submitReferralBtn.addEventListener('click', async () => {
+                const referralCode = modalReferralCode.value.trim();
                 
-                if (!phoneNumber.startsWith('+82')) {
-                    showMessage(document.getElementById('login-message'), '한국 번호는 +82로 시작해야 합니다 (예: +821012345678)', 'error');
+                if (!['2028317', '6389'].includes(referralCode)) {
+                    showMessage(referralModalMessage, '유효하지 않은 추천인 코드입니다.', 'error');
                     return;
                 }
                 
-                try {
-                    confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier);
-                    verificationCodeContainer.style.display = 'block';
-                    showMessage(document.getElementById('login-message'), '인증번호가 전송되었습니다. SMS를 확인해주세요.', 'success');
-                } catch (error) {
-                    handleAuthError(error, document.getElementById('login-message'));
-                }
-            });
-            
-            verifyCodeBtn.addEventListener('click', async () => {
-                const verificationCode = document.getElementById('verification-code').value;
+                // 추천인 코드가 유효한 경우
+                referralModal.style.display = 'none';
+                showMessage(document.getElementById('login-message'), `Google 로그인 성공! ${googleUser.displayName || '사용자'}님 환영합니다.`, 'success');
                 
-                try {
-                    await confirmationResult.confirm(verificationCode);
-                    phoneAuthContainer.style.display = 'none';
-                    showMessage(document.getElementById('login-message'), '전화번호 인증이 완료되었습니다!', 'success');
-                } catch (error) {
-                    handleAuthError(error, document.getElementById('login-message'));
-                }
-            });
-            
-            function initializeRecaptcha() {
-                if (recaptchaVerifier) return;
-                
-                recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-                    size: 'invisible',
-                    callback: () => {}
-                });
-            }
-        }
-
-        // 크로스 디바이스 로그인 핸들러 (간소화 버전)
-        function setupCrossDeviceLogin() {
-            const crossDeviceBtn = document.getElementById('cross-device-btn');
-            const crossDeviceContainer = document.getElementById('cross-device-container');
-            const copyLinkBtn = document.getElementById('copy-link-btn');
-            const cancelCrossDeviceBtn = document.getElementById('cancel-cross-device');
-            
-            crossDeviceBtn.addEventListener('click', () => {
-                crossDeviceContainer.style.display = 'block';
-                document.getElementById('phone-auth-container').style.display = 'none';
-                
-                // 간단한 링크 생성 (실제 구현에서는 Firebase Dynamic Links 사용 권장)
-                const link = `https://${window.location.hostname}/complete-login?token=${Date.now()}`;
-                
-                // QR 코드 생성
-                if (window.QRCode) {
-                    document.getElementById('qr-code').innerHTML = '';
-                    new QRCode(document.getElementById('qr-code'), {
-                        text: link,
-                        width: 200,
-                        height: 200
-                    });
-                }
-                
-                document.getElementById('cross-device-link').textContent = link;
-            });
-            
-            copyLinkBtn.addEventListener('click', () => {
-                const link = document.getElementById('cross-device-link').textContent;
-                navigator.clipboard.writeText(link)
-                    .then(() => showMessage(document.getElementById('login-message'), '링크가 복사되었습니다!', 'success'))
-                    .catch(() => prompt('링크를 복사해주세요', link));
-            });
-            
-            cancelCrossDeviceBtn.addEventListener('click', () => {
-                crossDeviceContainer.style.display = 'none';
+                // 모달 초기화
+                modalReferralCode.value = '';
+                referralModalMessage.classList.add('hidden');
             });
         }
 
@@ -629,11 +517,6 @@
                 'auth/wrong-password': '비밀번호가 일치하지 않습니다.',
                 'auth/invalid-email': '유효하지 않은 아이디 형식입니다.',
                 'auth/weak-password': '비밀번호는 8자 이상이어야 합니다.',
-                'auth/invalid-phone-number': '유효하지 않은 전화번호 형식입니다.',
-                'auth/captcha-check-failed': 'reCAPTCHA 확인에 실패했습니다.',
-                'auth/invalid-verification-code': '잘못된 인증번호입니다.',
-                'auth/credential-already-in-use': '이미 사용 중인 계정입니다.',
-                'auth/operation-not-supported-in-this-environment': '현재 환경에서는 이 작업을 지원하지 않습니다.',
                 'auth/too-many-requests': '너무 많은 시도가 있었습니다. 나중에 다시 시도해주세요.',
                 'default': error.message
             };
@@ -646,8 +529,6 @@
         // 초기화 함수 실행
         document.addEventListener('DOMContentLoaded', () => {
             setupGoogleLogin();
-            setupPhoneLogin();
-            setupCrossDeviceLogin();
             setupEmailLogin();
             setupAuthStateListener();
         });
