@@ -294,7 +294,7 @@
                         </div>
                         <div class="form-group">
                             <label for="referral-code">추천인 코드</label>
-                            <input type="text" id="referral-code" class="form-control" placeholder="2028317 또는 6389" required>
+                            <input type="text" id="referral-code" class="form-control" placeholder="추천인 코드를 입력하세요" required>
                         </div>
                         <button type="submit" class="btn">회원가입</button>
                     </form>
@@ -376,13 +376,6 @@
                     const result = await auth.signInWithPopup(provider);
                     googleUser = result.user;
                     
-                    // 특정 이메일 차단 기능 추가
-                    if (googleUser.email === 'coolskyunicorns3718@gmail.com') {
-                        showMessage(document.getElementById('login-message'), '뭐야 너는??', 'error');
-                        await auth.signOut(); // 즉시 로그아웃 처리
-                        return;
-                    }
-                    
                     // 추천인 코드 입력 모달 표시
                     referralModal.style.display = 'flex';
                 } catch (error) {
@@ -440,7 +433,7 @@
                 const referralCode = e.target['referral-code'].value;
                 const messageDiv = document.getElementById('signup-message');
                 
-                if (!['2028317', '6389'].includes(referralCode)) {
+                if (!['1947254', '4376'].includes(referralCode)) {
                     showMessage(messageDiv, '유효하지 않은 추천인 코드입니다.', 'error');
                     return;
                 }
