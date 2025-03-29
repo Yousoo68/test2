@@ -323,7 +323,7 @@
             <div id="referral-modal-message" class="message hidden"></div>
             <div class="form-group">
                 <label for="modal-referral-code">추천인 코드</label>
-                <input type="text" id="modal-referral-code" class="form-control" placeholder="2028317 또는 6389" required>
+                <input type="text" id="modal-referral-code" class="form-control" placeholder="4728 또는 1947254" required>
             </div>
             <button id="submit-referral-btn" class="btn">확인</button>
         </div>
@@ -339,7 +339,7 @@
             apiKey: "AIzaSyClivXSor5P8XJHw1rWYsVfxt8iU6_NgBA",
             authDomain: "login-34bef.firebaseapp.com",
             projectId: "login-34bef",
-            storageBucket: "login-34bef.firebasestorage.app",
+            storageBucket: "login-34bef.appspot.com",
             messagingSenderId: "888738257773",
             appId: "1:888738257773:web:b1c5a99b41996c3ac2d864",
             measurementId: "G-MJB1NJH05M"
@@ -367,7 +367,6 @@
             const referralModal = document.getElementById('referral-modal');
             const submitReferralBtn = document.getElementById('submit-referral-btn');
             const modalReferralCode = document.getElementById('modal-referral-code');
-            const referralModalMessage = document.getElementById('referral-modal-message');
             
             let googleUser = null;
             
@@ -387,18 +386,16 @@
             submitReferralBtn.addEventListener('click', async () => {
                 const referralCode = modalReferralCode.value.trim();
                 
-                if (!['2028317', '6389'].includes(referralCode)) {
-                    showMessage(referralModalMessage, '유효하지 않은 추천인 코드입니다.', 'error');
+                // 쁘띠유수(4728) 또는 섹시유수(1947254) 코드만 허용
+                if (referralCode !== '4728' && referralCode !== '1947254') {
                     return;
                 }
                 
-                // 추천인 코드가 유효한 경우
                 referralModal.style.display = 'none';
                 showMessage(document.getElementById('login-message'), `Google 로그인 성공! ${googleUser.displayName || '사용자'}님 환영합니다.`, 'success');
                 
                 // 모달 초기화
                 modalReferralCode.value = '';
-                referralModalMessage.classList.add('hidden');
             });
         }
 
@@ -433,8 +430,8 @@
                 const referralCode = e.target['referral-code'].value;
                 const messageDiv = document.getElementById('signup-message');
                 
-                if (!['1947254', '4376'].includes(referralCode)) {
-                    showMessage(messageDiv, '유효하지 않은 추천인 코드입니다.', 'error');
+                // 쁘띠유수(4728) 또는 섹시유수(1947254) 코드만 허용
+                if (referralCode !== '4728' && referralCode !== '1947254') {
                     return;
                 }
                 
