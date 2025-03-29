@@ -371,7 +371,6 @@
         <div class="auth-container">
             <div class="tabs">
                 <div class="tab active" data-tab="login">로그인</div>
-                <div class="tab" data-tab="delete">계정 삭제</div>
             </div>
             
             <div class="tab-content">
@@ -397,18 +396,6 @@
                                 Google로 로그인
                             </span>
                         </button>
-                    </div>
-                </div>
-                
-                <div id="delete" class="tab-pane">
-                    <div id="delete-message" class="message hidden"></div>
-                    <div id="current-user-info" class="current-user-info hidden">
-                        <p><strong>현재 로그인된 계정:</strong></p>
-                        <p id="current-user-email"></p>
-                        <button id="delete-account-btn" class="btn btn-danger" style="margin-top: 1rem;">계정 삭제</button>
-                    </div>
-                    <div id="not-logged-in-message" class="message">
-                        계정 삭제를 위해서는 먼저 로그인해주세요.
                     </div>
                 </div>
             </div>
@@ -557,34 +544,6 @@
             });
         }
 
-        // 계정 삭제 핸들러
-        function setupAccountDeletion() {
-            const deleteAccountBtn = document.getElementById('delete-account-btn');
-            
-            deleteAccountBtn.addEventListener('click', async () => {
-                const user = auth.currentUser;
-                const messageDiv = document.getElementById('delete-message');
-                
-                if (!user) {
-                    showMessage(messageDiv, '로그인이 필요합니다.', 'error');
-                    return;
-                }
-                
-                try {
-                    await user.delete();
-                    showMessage(messageDiv, '계정이 성공적으로 삭제되었습니다.', 'success');
-                    updateUI(null);
-                } catch (error) {
-                    if (error.code === 'auth/requires-recent-login') {
-                        showMessage(messageDiv, '계정 삭제를 위해 다시 로그인해주세요.', 'error');
-                        document.querySelector('.tab[data-tab="login"]').click();
-                    } else {
-                        handleAuthError(error, messageDiv);
-                    }
-                }
-            });
-        }
-
         // 로그아웃 핸들러
         logoutBtn.addEventListener('click', () => {
             if (isGuest) {
@@ -713,7 +672,6 @@
         // 초기화 함수 실행
         document.addEventListener('DOMContentLoaded', () => {
             setupGoogleLogin();
-            setupAccountDeletion();
             setupAuthStateListener();
         });
     </script>
