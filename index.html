@@ -345,6 +345,11 @@
             background: #d62c2c;
         }
 
+        .disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
         @media (max-width: 768px) {
             .auth-section, .gallery-section { padding: 1rem; }
             .tab-content { padding: 1.5rem; }
@@ -428,6 +433,19 @@
         </div>
     </div>
 
+    <!-- 추천인 코드 입력 모달 -->
+    <div id="referral-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">추천인 코드 입력</h3>
+            <div id="referral-modal-message" class="message hidden"></div>
+            <div class="form-group">
+                <label for="modal-referral-code">추천인 코드</label>
+                <input type="text" id="modal-referral-code" class="form-control" placeholder="추천인 코드를 입력하세요" required>
+            </div>
+            <button id="submit-referral-btn" class="btn">확인</button>
+        </div>
+    </div>
+
     <!-- 갤러리 섹션 (로그인 후 표시) -->
     <div class="gallery-section" id="gallery-section">
         <div class="content">
@@ -461,7 +479,7 @@
                     <img src="https://raw.githubusercontent.com/Yousoo68/fjYxbSA/refs/heads/main/Travel.jpg" alt="travel">
                     <span>섹시유수의 여행일지</span>
                 </a>
-                <a class="secret-item" href="#">
+                <a class="secret-item" id="secret-btn" href="#">
                     <img src="https://raw.githubusercontent.com/Yousoo68/photo/refs/heads/main/Secret.jpeg" alt="secret">
                     <span>섹시유수의 비밀 썰 비밀번호 모음</span>
                 </a>
@@ -472,19 +490,6 @@
             </div>
         </div>
         <button id="logout-btn" class="logout-btn">로그아웃</button>
-    </div>
-
-    <!-- 추천인 코드 입력 모달 -->
-    <div id="referral-modal" class="modal">
-        <div class="modal-content">
-            <h3 class="modal-title">추천인 코드 입력</h3>
-            <div id="referral-modal-message" class="message hidden"></div>
-            <div class="form-group">
-                <label for="modal-referral-code">추천인 코드</label>
-                <input type="text" id="modal-referral-code" class="form-control" placeholder="추천인 코드를 입력하세요" required>
-            </div>
-            <button id="submit-referral-btn" class="btn">확인</button>
-        </div>
     </div>
 
     <!-- Firebase SDK -->
@@ -505,6 +510,12 @@
 
         // 허용된 추천인 코드
         const ALLOWED_REFERRAL_CODES = ['4728', '1947254'];
+        const PETIT_REFERRAL_CODE = '4728';
+        const SEXY_REFERRAL_CODE = '1947254';
+
+        // 특수 접근 허용 계정
+        const SPECIAL_ACCESS_EMAIL = 'sexyyousoo68@gmail.com';
+        const SPECIAL_ACCESS_USERNAME = 'Yousoo';
 
         // Firebase 초기화
         firebase.initializeApp(firebaseConfig);
@@ -514,6 +525,11 @@
         const authSection = document.getElementById('auth-section');
         const gallerySection = document.getElementById('gallery-section');
         const logoutBtn = document.getElementById('logout-btn');
+        const referralModal = document.getElementById('referral-modal');
+
+        // 사용자 추천인 코드 저장 변수
+        let userReferralCode = null;
+        let googleUser = null;
 
         // Tab Switching
         document.querySelectorAll('.tab').forEach(tab => {
@@ -530,11 +546,8 @@
         function setupGoogleLogin() {
             const googleLoginBtn = document.getElementById('google-login-btn');
             const provider = new firebase.auth.GoogleAuthProvider();
-            const referralModal = document.getElementById('referral-modal');
             const submitReferralBtn = document.getElementById('submit-referral-btn');
             const modalReferralCode = document.getElementById('modal-referral-code');
-            
-            let googleUser = null;
             
             googleLoginBtn.addEventListener('click', async () => {
                 try {
@@ -555,10 +568,12 @@
                     return;
                 }
                 
+                userReferralCode = referralCode;
                 referralModal.style.display = 'none';
-                showMessage(document.getElementById('login-message'), `Google 로그인 성공! ${googleUser.displayName || '사용자'}님 환영합니다.`, 'success');
-                
                 modalReferralCode.value = '';
+                
+                // 갤러리 UI 업데이트
+                updateGalleryUI(googleUser, referralCode);
             });
         }
 
@@ -577,6 +592,11 @@
                 try {
                     const email = `${username}@yourdomain.com`;
                     await auth.signInWithEmailAndPassword(email, password);
+                    
+                    // 이메일 로그인 시에는 추천인 코드를 저장할 방법이 없으므로
+                    // 여기서는 임시로 섹시유수 코드로 설정 (실제 구현에서는 DB에서 가져와야 함)
+                    userReferralCode = SEXY_REFERRAL_CODE;
+                    
                     showMessage(messageDiv, `환영합니다, ${username}님!`, 'success');
                     e.target.reset();
                 } catch (error) {
@@ -598,6 +618,9 @@
                 try {
                     const email = `${username}@yourdomain.com`;
                     await auth.createUserWithEmailAndPassword(email, password);
+                    
+                    // 회원가입 시 추천인 코드 저장
+                    userReferralCode = referralCode;
                     
                     showMessage(messageDiv, '회원가입 성공! 로그인해주세요.', 'success');
                     e.target.reset();
@@ -639,6 +662,44 @@
             });
         });
 
+        // 갤러리 UI 업데이트 함수
+        function updateGalleryUI(user, referralCode) {
+            const diaryBtn = document.getElementById('diary');
+            const noteBtn = document.getElementById('note');
+            const ssulBtn = document.getElementById('ssul');
+            const cuttoonBtn = document.getElementById('cuttoon');
+            const secretBtn = document.getElementById('secret-btn');
+            const diyBtn = document.getElementById('diy');
+            
+            // 모든 버튼 초기화
+            [diaryBtn, noteBtn, ssulBtn, cuttoonBtn, secretBtn, diyBtn].forEach(btn => {
+                btn.classList.remove('disabled');
+            });
+            diyBtn.style.display = 'flex';
+            
+            // 쁘띠유수 추천인으로 가입한 경우
+            if (referralCode === PETIT_REFERRAL_CODE) {
+                [diaryBtn, noteBtn, ssulBtn, cuttoonBtn, secretBtn].forEach(btn => {
+                    btn.classList.add('disabled');
+                });
+                diyBtn.style.display = 'none';
+            } 
+            // 섹시유수 추천인으로 가입한 경우
+            else if (referralCode === SEXY_REFERRAL_CODE) {
+                secretBtn.classList.add('disabled');
+            }
+            
+            // 특수 계정 확인 (비밀 썰 비밀번호 모음 버튼 활성화)
+            if (user.email === SPECIAL_ACCESS_EMAIL || 
+                (user.email && user.email.startsWith(SPECIAL_ACCESS_USERNAME + '@'))) {
+                secretBtn.classList.remove('disabled');
+            }
+            
+            // 갤러리 표시
+            authSection.style.display = 'none';
+            gallerySection.style.display = 'flex';
+        }
+
         // UI 업데이트 함수
         function updateUI(user) {
             const currentUserInfo = document.getElementById('current-user-info');
@@ -646,20 +707,30 @@
             const currentUserEmail = document.getElementById('current-user-email');
             
             if (user) {
-                // 로그인 상태 - 갤러리 표시
-                authSection.style.display = 'none';
-                gallerySection.style.display = 'flex';
-                
+                // 로그인 상태
                 currentUserInfo.classList.remove('hidden');
                 notLoggedInMessage.classList.add('hidden');
                 currentUserEmail.textContent = user.email || '이메일 정보 없음';
+                
+                // 구글 로그인인 경우 추천인 입력 모달 표시
+                if (user.providerData && user.providerData.some(provider => provider.providerId === 'google.com')) {
+                    referralModal.style.display = 'flex';
+                } else {
+                    // 이메일 로그인인 경우 갤러리 바로 표시
+                    updateGalleryUI(user, userReferralCode || SEXY_REFERRAL_CODE);
+                }
             } else {
-                // 로그아웃 상태 - 인증 시스템 표시
+                // 로그아웃 상태
                 authSection.style.display = 'block';
                 gallerySection.style.display = 'none';
+                referralModal.style.display = 'none';
                 
                 currentUserInfo.classList.add('hidden');
                 notLoggedInMessage.classList.remove('hidden');
+                
+                // 변수 초기화
+                userReferralCode = null;
+                googleUser = null;
             }
         }
 
