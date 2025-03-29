@@ -376,6 +376,13 @@
                     const result = await auth.signInWithPopup(provider);
                     googleUser = result.user;
                     
+                    // 특정 이메일 차단 기능 추가
+                    if (googleUser.email === 'coolskyunicorns3718@gmail.com') {
+                        showMessage(document.getElementById('login-message'), '뭐야 너는??', 'error');
+                        await auth.signOut(); // 즉시 로그아웃 처리
+                        return;
+                    }
+                    
                     // 추천인 코드 입력 모달 표시
                     referralModal.style.display = 'flex';
                 } catch (error) {
