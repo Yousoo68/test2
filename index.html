@@ -367,33 +367,13 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK 및 QR 코드 라이브러리 -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
-        import { 
-            getAuth, 
-            GoogleAuthProvider, 
-            signInWithPopup, 
-            signInWithPhoneNumber,
-            RecaptchaVerifier,
-            onAuthStateChanged,
-            signOut,
-            isSignInWithEmailLink,
-            signInWithEmailLink,
-            sendSignInLinkToEmail,
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword,
-            deleteUser,
-            reauthenticateWithCredential,
-            EmailAuthProvider
-        } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
-        
-        import { 
-            getDynamicLinks, 
-            onDynamicLink 
-        } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-dynamic-links.js";
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-dynamic-links.js"></script>
 
+    <script>
         // Firebase 구성
         const firebaseConfig = {
             apiKey: "AIzaSyClivXSor5P8XJHw1rWYsVfxt8iU6_NgBA",
@@ -406,8 +386,8 @@
         };
 
         // Firebase 초기화
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
 
         // Tab Switching
         document.querySelectorAll('.tab').forEach(tab => {
@@ -427,12 +407,12 @@
         // Google 로그인 핸들러
         function setupGoogleLogin() {
             const googleLoginBtn = document.getElementById('google-login-btn');
-            const provider = new GoogleAuthProvider();
+            const provider = new firebase.auth.GoogleAuthProvider();
             
             googleLoginBtn.addEventListener('click', async () => {
                 try {
-                    const result = await signInWithPopup(auth, provider);
-                    showMessage(document.getElementById('login-message'), `Google 로그인 성공! ${result.user.displayName}님 환영합니다.`, 'success');
+                    const result = await auth.signInWithPopup(provider);
+                    showMessage(document.getElementById('login-message'), `Google 로그인 성공! ${result.user.displayName || '사용자'}님 환영합니다.`, 'success');
                 } catch (error) {
                     handleAuthError(error, document.getElementById('login-message'));
                 }
@@ -465,7 +445,7 @@
                 }
                 
                 try {
-                    confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+                    confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier);
                     verificationCodeContainer.style.display = 'block';
                     showMessage(document.getElementById('login-message'), '인증번호가 전송되었습니다. SMS를 확인해주세요.', 'success');
                 } catch (error) {
@@ -488,27 +468,38 @@
             function initializeRecaptcha() {
                 if (recaptchaVerifier) return;
                 
-                recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+                recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
                     size: 'invisible',
                     callback: () => {}
-                }, auth);
+                });
             }
         }
 
-        // 크로스 디바이스 로그인 핸들러
+        // 크로스 디바이스 로그인 핸들러 (간소화 버전)
         function setupCrossDeviceLogin() {
             const crossDeviceBtn = document.getElementById('cross-device-btn');
             const crossDeviceContainer = document.getElementById('cross-device-container');
             const copyLinkBtn = document.getElementById('copy-link-btn');
             const cancelCrossDeviceBtn = document.getElementById('cancel-cross-device');
             
-            let crossDeviceTimeout;
-            const CROSS_DEVICE_TIMEOUT = 5 * 60 * 1000; // 5분
-            
             crossDeviceBtn.addEventListener('click', () => {
                 crossDeviceContainer.style.display = 'block';
                 document.getElementById('phone-auth-container').style.display = 'none';
-                generateCrossDeviceLink();
+                
+                // 간단한 링크 생성 (실제 구현에서는 Firebase Dynamic Links 사용 권장)
+                const link = `https://${window.location.hostname}/complete-login?token=${Date.now()}`;
+                
+                // QR 코드 생성
+                if (window.QRCode) {
+                    document.getElementById('qr-code').innerHTML = '';
+                    new QRCode(document.getElementById('qr-code'), {
+                        text: link,
+                        width: 200,
+                        height: 200
+                    });
+                }
+                
+                document.getElementById('cross-device-link').textContent = link;
             });
             
             copyLinkBtn.addEventListener('click', () => {
@@ -519,97 +510,8 @@
             });
             
             cancelCrossDeviceBtn.addEventListener('click', () => {
-                resetCrossDeviceUI();
-            });
-            
-            // 동적 링크 리스너 설정
-            if (typeof firebase !== 'undefined' && firebase.dynamicLinks) {
-                firebase.dynamicLinks().onLink(handleDynamicLink);
-                firebase.dynamicLinks().getInitialLink()
-                    .then(handleDynamicLink)
-                    .catch(error => {
-                        console.error('동적 링크 처리 오류:', error);
-                    });
-            }
-            
-            async function generateCrossDeviceLink() {
-                try {
-                    const email = `cross-device-${Date.now()}@temp.com`;
-                    const actionCodeSettings = {
-                        url: `https://${window.location.hostname}/complete-login`,
-                        handleCodeInApp: true
-                    };
-                    
-                    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-                    
-                    const dynamicLinkDomain = 'login-34bef.page.link'; // Firebase 콘솔에서 확인
-                    const dynamicLink = await firebase.dynamicLinks().createShortLink({
-                        link: `https://${window.location.hostname}/complete-login?provider=cross-device`,
-                        domainUriPrefix: `https://${dynamicLinkDomain}`,
-                        androidInfo: {
-                            androidPackageName: 'com.example.android',
-                        },
-                        iosInfo: {
-                            iosBundleId: 'com.example.ios',
-                        },
-                        socialMetaTagInfo: {
-                            socialTitle: '로그인을 완료해주세요',
-                            socialDescription: '다른 기기에서 로그인을 완료하세요',
-                        },
-                    });
-                    
-                    // QR 코드 생성
-                    if (window.QRCode) {
-                        document.getElementById('qr-code').innerHTML = '';
-                        new QRCode(document.getElementById('qr-code'), {
-                            text: dynamicLink.shortLink,
-                            width: 200,
-                            height: 200
-                        });
-                    }
-                    
-                    document.getElementById('cross-device-link').textContent = dynamicLink.shortLink;
-                    
-                    // 타임아웃 설정
-                    crossDeviceTimeout = setTimeout(() => {
-                        showMessage(document.getElementById('login-message'), '로그인 시간이 만료되었습니다. 다시 시도해주세요.', 'error');
-                        resetCrossDeviceUI();
-                    }, CROSS_DEVICE_TIMEOUT);
-                    
-                } catch (error) {
-                    handleAuthError(error, document.getElementById('login-message'));
-                    resetCrossDeviceUI();
-                }
-            }
-            
-            function handleDynamicLink(link) {
-                if (!link || !link.url) return;
-                
-                if (isSignInWithEmailLink(auth, link.url)) {
-                    let email = window.localStorage.getItem('emailForSignIn');
-                    
-                    if (!email) {
-                        email = window.prompt('이메일을 입력해주세요:');
-                    }
-                    
-                    signInWithEmailLink(auth, email, link.url)
-                        .then(() => {
-                            window.localStorage.removeItem('emailForSignIn');
-                            showMessage(document.getElementById('login-message'), '다른 기기에서 로그인이 완료되었습니다!', 'success');
-                        })
-                        .catch(error => {
-                            handleAuthError(error, document.getElementById('login-message'));
-                        });
-                }
-            }
-            
-            function resetCrossDeviceUI() {
-                if (crossDeviceTimeout) {
-                    clearTimeout(crossDeviceTimeout);
-                    crossDeviceTimeout = null;
-                }
                 crossDeviceContainer.style.display = 'none';
-            }
+            });
         }
 
         // 이메일/비밀번호 로그인 핸들러
@@ -627,7 +529,7 @@
                 
                 try {
                     const email = `${username}@yourdomain.com`;
-                    await signInWithEmailAndPassword(auth, email, password);
+                    await auth.signInWithEmailAndPassword(email, password);
                     showMessage(messageDiv, `환영합니다, ${username}님!`, 'success');
                     e.target.reset();
                 } catch (error) {
@@ -650,7 +552,7 @@
                 
                 try {
                     const email = `${username}@yourdomain.com`;
-                    await createUserWithEmailAndPassword(auth, email, password);
+                    await auth.createUserWithEmailAndPassword(email, password);
                     showMessage(messageDiv, '회원가입 성공! 로그인해주세요.', 'success');
                     e.target.reset();
                 } catch (error) {
@@ -669,7 +571,7 @@
                 }
                 
                 try {
-                    await deleteUser(user);
+                    await user.delete();
                     showMessage(messageDiv, '계정이 성공적으로 삭제되었습니다.', 'success');
                     updateUserUI(null);
                 } catch (error) {
@@ -685,7 +587,7 @@
 
         // 인증 상태 리스너
         function setupAuthStateListener() {
-            onAuthStateChanged(auth, (user) => {
+            auth.onAuthStateChanged((user) => {
                 updateUserUI(user);
             });
         }
@@ -699,7 +601,7 @@
             if (user) {
                 currentUserInfo.classList.remove('hidden');
                 notLoggedInMessage.classList.add('hidden');
-                currentUserEmail.textContent = user.email;
+                currentUserEmail.textContent = user.email || '이메일 정보 없음';
             } else {
                 currentUserInfo.classList.add('hidden');
                 notLoggedInMessage.classList.remove('hidden');
