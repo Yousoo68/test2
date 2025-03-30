@@ -402,19 +402,6 @@
         </div>
     </div>
 
-    <!-- 추천인 코드 입력 모달 -->
-    <div id="referral-modal" class="modal">
-        <div class="modal-content">
-            <h3 class="modal-title">추천인 코드 입력</h3>
-            <div id="referral-modal-message" class="message hidden"></div>
-            <div class="form-group">
-                <label for="modal-referral-code">추천인 코드</label>
-                <input type="text" id="modal-referral-code" class="form-control" placeholder="추천인 코드를 입력하세요" required>
-            </div>
-            <button id="submit-referral-btn" class="btn">확인</button>
-        </div>
-    </div>
-
     <!-- 갤러리 섹션 (로그인 후 표시) -->
     <div class="gallery-section" id="gallery-section">
         <div class="content">
@@ -489,23 +476,13 @@
         const authSection = document.getElementById('auth-section');
         const gallerySection = document.getElementById('gallery-section');
         const logoutBtn = document.getElementById('logout-btn');
-        const referralModal = document.getElementById('referral-modal');
         const guestLoginBtn = document.getElementById('guest-login-btn');
+        const googleLoginBtn = document.getElementById('google-login-btn');
+        const loginMessage = document.getElementById('login-message');
 
         // 사용자 상태 변수
         let currentUser = null;
         let isGuest = false;
-
-        // Tab Switching
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-                
-                tab.classList.add('active');
-                document.getElementById(tab.dataset.tab).classList.add('active');
-            });
-        });
 
         // Guest 로그인 핸들러
         guestLoginBtn.addEventListener('click', () => {
@@ -518,31 +495,25 @@
         });
 
         // Google 로그인 핸들러
-        function setupGoogleLogin() {
-            const googleLoginBtn = document.getElementById('google-login-btn');
-            const provider = new firebase.auth.GoogleAuthProvider();
-            const submitReferralBtn = document.getElementById('submit-referral-btn');
-            const modalReferralCode = document.getElementById('modal-referral-code');
-            
-            googleLoginBtn.addEventListener('click', async () => {
-                try {
-                    const result = await auth.signInWithPopup(provider);
-                    currentUser = result.user;
-                    isGuest = false;
-                    
-                    // 특수 계정인 경우 바로 갤러리 표시
-                    if (currentUser.email === SPECIAL_ACCOUNT_1 || currentUser.email === SPECIAL_ACCOUNT_2) {
-                        updateGalleryUI(currentUser);
-                    } else {
-                        // 일반 구글 계정은 Guest와 동일하게 처리
-                        isGuest = true;
-                        updateUI(currentUser);
-                    }
-                } catch (error) {
-                    handleAuthError(error, document.getElementById('login-message'));
+        googleLoginBtn.addEventListener('click', async () => {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                currentUser = result.user;
+                isGuest = false;
+                
+                // 특수 계정인 경우 바로 갤러리 표시
+                if (currentUser.email === SPECIAL_ACCOUNT_1 || currentUser.email === SPECIAL_ACCOUNT_2) {
+                    updateGalleryUI(currentUser);
+                } else {
+                    // 일반 구글 계정은 Guest와 동일하게 처리
+                    isGuest = true;
+                    updateUI(currentUser);
                 }
-            });
-        }
+            } catch (error) {
+                handleAuthError(error, loginMessage);
+            }
+        });
 
         // 로그아웃 핸들러
         logoutBtn.addEventListener('click', () => {
@@ -574,54 +545,37 @@
             
             // 모든 버튼 초기화
             [diaryBtn, noteBtn, ssulBtn, cuttoonBtn, secretBtn, travelBtn, diyBtn].forEach(btn => {
-                btn.classList.remove('disabled');
+                if (btn) btn.classList.remove('disabled');
             });
-            diyBtn.style.display = 'flex';
+            if (diyBtn) diyBtn.style.display = 'flex';
             
             if (isGuest || (user && user.email !== SPECIAL_ACCOUNT_1 && user.email !== SPECIAL_ACCOUNT_2)) {
                 // Guest 또는 일반 구글 계정인 경우
                 [diaryBtn, noteBtn, ssulBtn, cuttoonBtn, secretBtn].forEach(btn => {
-                    btn.classList.add('disabled');
+                    if (btn) btn.classList.add('disabled');
                 });
-                diyBtn.style.display = 'none';
+                if (diyBtn) diyBtn.style.display = 'none';
             } else if (user && user.email === SPECIAL_ACCOUNT_2) {
                 // shinyousoo68@gmail.com 계정인 경우
-                secretBtn.classList.add('disabled');
+                if (secretBtn) secretBtn.classList.add('disabled');
             }
             // sexyousoo68@gmail.com 계정은 모든 버튼 활성화
             
             // 갤러리 표시
-            authSection.style.display = 'none';
-            gallerySection.style.display = 'flex';
+            if (authSection) authSection.style.display = 'none';
+            if (gallerySection) gallerySection.style.display = 'flex';
         }
 
         // UI 업데이트 함수
         function updateUI(user) {
-            const currentUserInfo = document.getElementById('current-user-info');
-            const notLoggedInMessage = document.getElementById('not-logged-in-message');
-            const currentUserEmail = document.getElementById('current-user-email');
-            
             if (user || currentUser) {
                 // 로그인 상태
-                currentUserInfo.classList.remove('hidden');
-                notLoggedInMessage.classList.add('hidden');
-                
-                if (isGuest) {
-                    currentUserEmail.textContent = 'Guest 계정';
-                } else {
-                    currentUserEmail.textContent = user ? user.email : '이메일 정보 없음';
-                }
-                
                 // 갤러리 UI 업데이트
                 updateGalleryUI(user || currentUser);
             } else {
                 // 로그아웃 상태
-                authSection.style.display = 'block';
-                gallerySection.style.display = 'none';
-                referralModal.style.display = 'none';
-                
-                currentUserInfo.classList.add('hidden');
-                notLoggedInMessage.classList.remove('hidden');
+                if (authSection) authSection.style.display = 'block';
+                if (gallerySection) gallerySection.style.display = 'none';
                 
                 // 변수 초기화
                 currentUser = null;
@@ -659,20 +613,12 @@
         }
 
         // 인증 상태 리스너
-        function setupAuthStateListener() {
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    currentUser = user;
-                    isGuest = false;
-                }
-                updateUI(user);
-            });
-        }
-
-        // 초기화 함수 실행
-        document.addEventListener('DOMContentLoaded', () => {
-            setupGoogleLogin();
-            setupAuthStateListener();
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                isGuest = false;
+            }
+            updateUI(user);
         });
     </script>
 </body>
