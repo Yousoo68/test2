@@ -15,6 +15,7 @@
       background-color: #f0f0f0;
       font-family: sans-serif;
     }
+
     #viewer {
       display: none;
       position: fixed;
@@ -26,11 +27,13 @@
       background-color: black;
       z-index: 10;
     }
+
     #viewer img {
       display: block;
       width: 100%;
       height: auto;
     }
+
     #helloLink {
       font-size: 2rem;
       text-decoration: none;
@@ -38,22 +41,37 @@
       transition: color 0.3s;
       z-index: 1;
     }
+
     #helloLink:hover {
       color: #007BFF;
     }
+
     #closeBtn {
       position: fixed;
-      top: 10px;
-      right: 15px;
-      font-size: 2rem;
+      top: 20px;
+      right: 20px;
+      font-size: 3rem;
       color: white;
-      background: transparent;
+      background: rgba(0, 0, 0, 0.5);
       border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
       cursor: pointer;
-      z-index: 20;
+      z-index: 999;
     }
+
     #closeBtn:hover {
-      color: #ff4d4d;
+      background: rgba(255, 0, 0, 0.6);
+    }
+
+    /* 이미지 맨 아래 클릭 영역 */
+    #bottomClickArea {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100px; /* 맨 아래 100px 클릭 영역 */
+      z-index: 20;
     }
   </style>
 </head>
@@ -63,6 +81,7 @@
   <div id="viewer">
     <button id="closeBtn" onclick="hideImage()">×</button>
     <img src="https://i.ibb.co/xqg2RL3B/SSUL6.jpg" alt="이미지">
+    <a id="bottomClickArea" href="https://i.ibb.co/xqg2RL3B/SSUL423.jpg" target="_blank"></a>
   </div>
 
   <script>
