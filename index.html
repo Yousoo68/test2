@@ -23,26 +23,27 @@
       height: 100%;
       overflow-y: auto;
       background-color: black;
+      z-index: 10;
     }
     #viewer img {
       display: block;
       width: 100%;
       height: auto;
     }
-    a {
+    #helloLink {
       font-size: 2rem;
       text-decoration: none;
       color: #333;
       transition: color 0.3s;
       z-index: 1;
     }
-    a:hover {
+    #helloLink:hover {
       color: #007BFF;
     }
   </style>
 </head>
 <body>
-  <a href="#" onclick="showImage()">안녕</a>
+  <a id="helloLink" href="#" onclick="showImage()">안녕</a>
 
   <div id="viewer">
     <img src="https://i.ibb.co/xqg2RL3B/SSUL6.jpg" alt="이미지">
@@ -50,8 +51,18 @@
 
   <script>
     function showImage() {
+      document.getElementById('helloLink').style.display = 'none';
       document.getElementById('viewer').style.display = 'block';
+      history.pushState({ imageShown: true }, "Image View");
     }
+
+    window.addEventListener("popstate", function(event) {
+      // 뒤로가기 눌렀을 때 이미지 숨기고 "안녕" 다시 보이게
+      if (event.state && event.state.imageShown) {
+        document.getElementById('viewer').style.display = 'none';
+        document.getElementById('helloLink').style.display = 'block';
+      }
+    });
   </script>
 </body>
 </html>
