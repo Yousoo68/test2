@@ -306,6 +306,17 @@
             transform: translateY(-2px);
         }
 
+        .subtitle.disabled {
+            color: #999;
+            cursor: not-allowed;
+            background-color: #f5f5f5;
+        }
+
+        .subtitle.disabled:hover {
+            background-color: #f5f5f5;
+            transform: none;
+        }
+
         .disclaimer {
             font-size: 12px;
             color: #777;
@@ -463,14 +474,14 @@
             
             <div class="category-button" onclick="toggleCategory('a-permanent')">A독자 영구공개 썰</div>
             <div id="a-permanent" class="category-content">
-                <div class="subtitle" style="color: var(--primary-color);" onclick="showImage('https://i.ibb.co/KpvZFGTM/K3eu95v-MJU.jpg', true)">담배 첫경험 썰</div>
+                <div class="subtitle" style="color: var(--primary-color);" onclick="showImage('https://i.ibb.co/KpvZFGTM/K3eu95v-MJU.jpg', true)" id="tobacco-story">담배 첫경험 썰</div>
             </div>
             
             <div class="category-button" onclick="toggleCategory('all-permanent')">전체 영구공개 썰</div>
             <div id="all-permanent" class="category-content">
-                <div class="subtitle" onclick="showImage('https://i.ibb.co/Z6cdJbpM/cnf-KMGI1-FR.jpg')">희비가 교차하는 반배정 썰</div>
-                <div class="subtitle" onclick="showImage('https://i.ibb.co/9kMcQVDK/s-R3u-U3ga-Qu.jpg')">우왕좌왕 헬정자의 헬스 썰</div>
-                <div class="subtitle" style="color: var(--primary-color);" onclick="showImage('https://i.ibb.co/PsNrQ51d/nw-Wt5-Qba-Ho.jpg')">신의 아들임과 동시에 신의 조카가 된 썰</div>
+                <div class="subtitle" onclick="showImage('https://i.ibb.co/Z6cdJbpM/cnf-KMGI1-FR.jpg')" id="assignment-story">희비가 교차하는 반배정 썰</div>
+                <div class="subtitle" onclick="showImage('https://i.ibb.co/9kMcQVDK/s-R3u-U3ga-Qu.jpg')" id="gym-story">우왕좌왕 헬정자의 헬스 썰</div>
+                <div class="subtitle" style="color: var(--primary-color);" onclick="showImage('https://i.ibb.co/PsNrQ51d/nw-Wt5-Qba-Ho.jpg')" id="god-story">신의 아들임과 동시에 신의 조카가 된 썰</div>
             </div>
 
             <div class="large-image-container">
@@ -503,13 +514,12 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <script>
-        // 특수 계정 정의
-        const P_ACCOUNTS = [
+        // 계정 분류 정의
+        const P_READER = [
             'fjrtufl9909@gmail.com',
             'minjune003956@gmail.com',
             'sexyyousoo68@gmail.com',
             'seojunna73@gmail.com',
-            'seyun07070782@gmail.com',
             'chaejun0708@gmail.com',
             'sonhyeonmins@gmail.com',
             'rang330579@gmail.com',
@@ -518,16 +528,18 @@
             'kjuho0716@gmail.com'
         ];
         
-        const A_ACCOUNTS = [
+        const A_READER = [
             'shinjonghwan0430@gmail.com',
-            'fofmmm1605@gmail.com'
+            'fofmmm1605@gmail.com',
+            'shinyousoo68@gmail.com'
         ];
 
-        // 리디렉션 계정
-        const REDIRECT_ACCOUNTS = [
-            'kr.noob12340@gmail.com',
-            'seyun07070782@gmail.com'
+        const B_READER = [
+            'seubuntb@gmail.com'
         ];
+
+        // 리디렉션 계정 (위에 정의된 계정 외 모든 계정)
+        const REDIRECT_URL = 'https://yousoo68.github.io/fjYxbSA/';
 
         // Firebase 구성
         const firebaseConfig = {
@@ -557,6 +569,7 @@
         // 사용자 상태 변수
         let currentUser = null;
         let isGuest = false;
+        let userRole = null; // 'P_READER', 'A_READER', 'B_READER' 또는 null
 
         // Guest 로그인 핸들러
         guestLoginBtn.addEventListener('click', () => {
@@ -565,6 +578,7 @@
                 email: 'guest@example.com',
                 isGuest: true
             };
+            userRole = null;
             updateUI(currentUser);
         });
 
@@ -576,13 +590,21 @@
                 currentUser = result.user;
                 isGuest = false;
                 
-                // 리디렉션 계정 확인
-                if (REDIRECT_ACCOUNTS.includes(currentUser.email)) {
-                    window.location.href = 'https://yousoo68.github.io/IHTgAiw/';
+                // 계정 분류 확인
+                if (P_READER.includes(currentUser.email)) {
+                    userRole = 'P_READER';
+                } else if (A_READER.includes(currentUser.email)) {
+                    userRole = 'A_READER';
+                } else if (B_READER.includes(currentUser.email)) {
+                    userRole = 'B_READER';
+                } else {
+                    // 정의된 계정이 아닌 경우 리디렉션
+                    window.location.href = REDIRECT_URL;
                     return;
                 }
                 
                 updateUI(currentUser);
+                setupContentAccess();
             } catch (error) {
                 console.error('Google 로그인 오류:', error);
             }
@@ -594,17 +616,79 @@
                 // Guest 로그아웃
                 currentUser = null;
                 isGuest = false;
+                userRole = null;
                 updateUI(null);
             } else {
                 // Google 계정 로그아웃
                 auth.signOut().then(() => {
                     currentUser = null;
+                    userRole = null;
                     updateUI(null);
                 }).catch((error) => {
                     console.error('로그아웃 오류:', error);
                 });
             }
         });
+
+        // 콘텐츠 접근 설정 함수
+        function setupContentAccess() {
+            // 모든 카테고리 버튼 활성화
+            const categoryButtons = document.querySelectorAll('.category-button');
+            categoryButtons.forEach(button => {
+                button.style.pointerEvents = 'auto';
+                button.style.opacity = '1';
+            });
+
+            // 모든 카테고리 콘텐츠 펼치기
+            const categoryContents = document.querySelectorAll('.category-content');
+            categoryContents.forEach(content => {
+                content.style.display = 'block';
+            });
+
+            // P_READER: 모든 콘텐츠 활성화
+            if (userRole === 'P_READER') {
+                const allSubtitles = document.querySelectorAll('.subtitle');
+                allSubtitles.forEach(subtitle => {
+                    subtitle.classList.remove('disabled');
+                });
+                return;
+            }
+
+            // A_READER: 특정 콘텐츠만 활성화
+            if (userRole === 'A_READER') {
+                const subtitles = document.querySelectorAll('.subtitle');
+                subtitles.forEach(subtitle => {
+                    // '담배 첫경험 썰', '희비가 교차하는 반배정 썰', '우왕좌왕 헬정자의 헬스 썰', '신의 아들임과 동시에 신의 조카가 된 썰'만 활성화
+                    const allowedIds = ['tobacco-story', 'assignment-story', 'gym-story', 'god-story'];
+                    if (!allowedIds.includes(subtitle.id)) {
+                        subtitle.classList.add('disabled');
+                        subtitle.onclick = null;
+                    }
+                });
+                return;
+            }
+
+            // B_READER: 특정 콘텐츠만 활성화
+            if (userRole === 'B_READER') {
+                const subtitles = document.querySelectorAll('.subtitle');
+                subtitles.forEach(subtitle => {
+                    // '희비가 교차하는 반배정 썰', '우왕좌왕 헬정자의 헬스 썰', '신의 아들임과 동시에 신의 조카가 된 썰'만 활성화
+                    const allowedIds = ['assignment-story', 'gym-story', 'god-story'];
+                    if (!allowedIds.includes(subtitle.id)) {
+                        subtitle.classList.add('disabled');
+                        subtitle.onclick = null;
+                    }
+                });
+                return;
+            }
+
+            // Guest 또는 기타: 모든 콘텐츠 비활성화
+            const subtitles = document.querySelectorAll('.subtitle');
+            subtitles.forEach(subtitle => {
+                subtitle.classList.add('disabled');
+                subtitle.onclick = null;
+            });
+        }
 
         // UI 업데이트 함수
         function updateUI(user) {
@@ -625,6 +709,7 @@
                 // 변수 초기화
                 currentUser = null;
                 isGuest = false;
+                userRole = null;
             }
         }
 
@@ -634,13 +719,24 @@
                 currentUser = user;
                 isGuest = false;
                 
-                // 리디렉션 계정 확인
-                if (REDIRECT_ACCOUNTS.includes(currentUser.email)) {
-                    window.location.href = 'https://yousoo68.github.io/IHTgAiw/';
+                // 계정 분류 확인
+                if (P_READER.includes(currentUser.email)) {
+                    userRole = 'P_READER';
+                } else if (A_READER.includes(currentUser.email)) {
+                    userRole = 'A_READER';
+                } else if (B_READER.includes(currentUser.email)) {
+                    userRole = 'B_READER';
+                } else {
+                    // 정의된 계정이 아닌 경우 리디렉션
+                    window.location.href = REDIRECT_URL;
                     return;
                 }
+                
+                updateUI(user);
+                setupContentAccess();
+            } else {
+                updateUI(null);
             }
-            updateUI(user);
         });
 
         // 초기 UI 설정
@@ -678,8 +774,8 @@
                 }
             };
 
-            // 담배 첫경험 썰 하단 클릭 리디렉션
-            if (hasRedirect) {
+            // P_READER만 담배 첫경험 썰 하단 클릭 리디렉션 활성화
+            if (hasRedirect && userRole === 'P_READER') {
                 img.onclick = function(e) {
                     const rect = this.getBoundingClientRect();
                     const y = e.clientY - rect.top;
@@ -690,6 +786,8 @@
                         return false; // 기본 동작 방지
                     }
                 };
+            } else {
+                img.onclick = null;
             }
         }
 
