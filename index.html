@@ -1,105 +1,708 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>안녕 링크</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      overflow: hidden;
-      font-family: sans-serif;
-      background-color: #f0f0f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>섹시유수의 비밀 썰SSUL</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4bb543;
+            --error: #ff3333;
+            --radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --primary-color: #6a5acd;
+            --secondary-color: #9370db;
+            --accent-color: #ff69b4;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+        }
 
-    #helloLink {
-      font-size: 2rem;
-      text-decoration: none;
-      color: #333;
-      transition: color 0.3s;
-      z-index: 1;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
 
-    #helloLink:hover {
-      color: #007BFF;
-    }
+        /* 로그인 패널 스타일 */
+        .auth-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    #viewer {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: black;
-      z-index: 10;
-      overflow-y: auto;
-    }
+        .auth-container {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            color: #666;
+            background: #f1f1f1;
+        }
+        
+        .tab.active {
+            background: white;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            padding: 2rem;
+        }
+        
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tab-pane.active { display: block; }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-guest {
+            background: #6c757d;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-guest:hover {
+            background: #5a6268;
+        }
+        
+        .btn-google {
+            background: #4285F4;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-danger {
+            background: var(--error);
+        }
+        
+        .btn-danger:hover {
+            background: #d62c2c;
+        }
+        
+        .message {
+            padding: 0.8rem 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .success { background-color: rgba(75, 181, 67, 0.1); color: var(--success); border: 1px solid rgba(75, 181, 67, 0.3); }
+        .error { background-color: rgba(255, 51, 51, 0.1); color: var(--error); border: 1px solid rgba(255, 51, 51, 0.3); }
+        .hidden { display: none !important; }
+        
+        .current-user-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .current-user-info p {
+            margin-bottom: 0.5rem;
+        }
 
-    #imageWrapper {
-      position: relative;
-      width: 100%;
-    }
+        .social-login {
+            margin-top: 1.5rem;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+        
+        .divider span:first-child,
+        .divider span:last-child {
+            flex-grow: 1;
+            height: 1px;
+            background: #ddd;
+        }
+        
+        .divider span:nth-child(2) {
+            padding: 0 1rem;
+            color: #666;
+        }
+        
+        .btn-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-icon svg {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+        }
 
-    #viewer img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
+        .user-info {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            font-size: 14px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logout-btn {
+            margin-left: 8px;
+            background: var(--error);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
 
-    #closeBtn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      font-size: 3rem;
-      color: white;
-      background: rgba(0, 0, 0, 0.5);
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      cursor: pointer;
-      z-index: 999;
-    }
+        @media (max-width: 768px) {
+            .auth-container { padding: 1rem; }
+            .tab-content { padding: 1.5rem; }
+        }
 
-    #closeBtn:hover {
-      background: rgba(255, 0, 0, 0.6);
-    }
+        /* 콘텐츠 섹션 스타일 */
+        .content-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            width: 100%;
+        }
 
-    #bottomClickArea {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 100px; /* 클릭 가능한 하단 영역 */
-      z-index: 20;
-    }
-  </style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .image-container {
+            width: 180px;
+            height: 180px;
+            background-color: white;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            box-shadow: var(--card-shadow);
+            border: 3px solid white;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--primary-color);
+            cursor: pointer;
+            margin-bottom: 12px;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+            background-color: white;
+            box-shadow: var(--card-shadow);
+            width: 100%;
+            text-align: left;
+        }
+
+        .subtitle:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .disclaimer {
+            font-size: 12px;
+            color: #777;
+            margin-top: 25px;
+            padding: 15px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            line-height: 1.5;
+        }
+
+        .large-image-container {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 25px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .large-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .youtube-embed {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 25px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .youtube-embed iframe {
+            width: 100%;
+            height: 280px;
+            border: none;
+        }
+
+        .category-button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .category-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .category-content {
+            width: 100%;
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .bold-text {
+            font-weight: bold;
+        }
+
+        /* 이미지 뷰어 스타일 - 전체 화면 꽉 차게 수정 */
+        .image-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: black;
+            z-index: 1000;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            display: none;
+        }
+
+        .image-viewer img {
+            width: 100vw;
+            height: auto;
+            display: block;
+            touch-action: pan-y;
+        }
+
+        /* 이미지가 화면 높이보다 작을 경우 중앙 정렬 */
+        .image-container-full {
+            width: 100vw;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
 </head>
 <body>
-  <a id="helloLink" href="#" onclick="showImage()">안녕</a>
-
-  <div id="viewer">
-    <button id="closeBtn" onclick="hideImage()">×</button>
-    <div id="imageWrapper">
-      <img src="https://i.ibb.co/xqg2RL3B/SSUL6.jpg" alt="이미지">
-      <a id="bottomClickArea" href="https://i.ibb.co/xqg2RL3B/SSUL423.jpg" target="_blank"></a>
+    <!-- 인증 섹션 -->
+    <div class="auth-section">
+        <div class="auth-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="login">로그인</div>
+            </div>
+            
+            <div class="tab-content">
+                <div id="login" class="tab-pane active">
+                    <div id="login-message" class="message hidden"></div>
+                    
+                    <div class="social-login">
+                        <button id="guest-login-btn" class="btn btn-guest">
+                            Guest로 로그인
+                        </button>
+                        
+                        <div class="divider">
+                            <span></span>
+                            <span>OR</span>
+                            <span></span>
+                        </div>
+                        
+                        <button id="google-login-btn" class="btn btn-google btn-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+                                <path fill="white" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/>
+                            </svg>
+                            Google로 로그인
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    function showImage() {
-      document.getElementById('helloLink').style.display = 'none';
-      document.getElementById('viewer').style.display = 'block';
-    }
+    <!-- 콘텐츠 섹션 -->
+    <div id="content-section" class="content-section">
+        <div class="container">
+            <div class="image-container">
+                <img src="https://raw.githubusercontent.com/Yousoo68/SSUL/refs/heads/main/SSULicon.jpg" alt="프로필 이미지">
+            </div>
+            <div class="title">섹시유수의 비밀 썰SSUL</div>
+            
+            <!-- 카테고리 버튼들 -->
+            <div class="category-button" onclick="toggleCategory('p-reader')">P독자 전용 썰</div>
+            <div id="p-reader" class="category-content">
+                <div class="subtitle" style="color: var(--accent-color);" onclick="showImage('https://i.ibb.co/TMRn3SbR/Bpqtm4xnra.jpg')"><span class="bold-text">공</span>중화장실에서 <span class="bold-text">섹</span>스한 <span class="bold-text">썰</span>🌶(매운맛)</div>
+                <div class="subtitle" style="color: var(--accent-color);" onclick="showImage('https://i.ibb.co/mrNnKVmF/8h-MJu-Bs-B6-K.jpg')">질싸할 뻔한 썰</div>
+            </div>
+            
+            <div class="category-button" onclick="toggleCategory('a-limited')">A독자 한정공개 썰</div>
+            <div id="a-limited" class="category-content">
+                <div class="subtitle" onclick="showImage('https://i.ibb.co/cKg3Vrdt/DPQHh-Hj-Ts-Q.jpg')"><span class="bold-text">공</span>중화장실에서 <span class="bold-text">섹</span>스한 <span class="bold-text">썰</span>🌿(순한맛)</div>
+                <div class="subtitle" style="color: var(--primary-color);" onclick="showImage('https://i.ibb.co/6JNbncnG/J16-JKu-FTL9.jpg')">중3때 아다 땐 첫경험 썰</div>
+            </div>
+            
+            <div class="category-button" onclick="toggleCategory('a-permanent')">A독자 영구공개 썰</div>
+            <div id="a-permanent" class="category-content">
+                <div class="subtitle" style="color: var(--primary-color);" onclick="showImage('https://i.ibb.co/KpvZFGTM/K3eu95v-MJU.jpg', true)">담배 첫경험 썰</div>
+            </div>
+            
+            <div class="category-button" onclick="toggleCategory('all-permanent')">전체 영구공개 썰</div>
+            <div id="all-permanent" class="category-content">
+                <div class="subtitle" onclick="showImage('https://i.ibb.co/Z6cdJbpM/cnf-KMGI1-FR.jpg')">희비가 교차하는 반배정 썰</div>
+                <div class="subtitle" onclick="showImage('https://i.ibb.co/9kMcQVDK/s-R3u-U3ga-Qu.jpg')">우왕좌왕 헬정자의 헬스 썰</div>
+                <div class="subtitle" style="color: var(--primary-color);" onclick="showImage('https://i.ibb.co/PsNrQ51d/nw-Wt5-Qba-Ho.jpg')">신의 아들임과 동시에 신의 조카가 된 썰</div>
+            </div>
 
-    function hideImage() {
-      document.getElementById('viewer').style.display = 'none';
-      document.getElementById('helloLink').style.display = 'block';
-    }
-  </script>
+            <div class="large-image-container">
+                <img src="https://raw.githubusercontent.com/Yousoo68/SSUL/refs/heads/main/Pyramid.jpg" alt="피라미드 이미지">
+            </div>
+            <div class="disclaimer">
+                섹시유수에서 제공하는 썰들은 필자가 실제로 겪은 일들 입니다.
+            </div>
+            <div class="youtube-embed">
+                <iframe src="https://www.youtube.com/embed/z6h3d-gwwvQ" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- 로그아웃 버튼 -->
+    <div id="user-info" class="user-info" style="display: none;">
+        <span id="user-email"></span>
+        <button id="logout-btn" class="logout-btn">로그아웃</button>
+    </div>
+
+    <!-- 이미지 뷰어 (전체 화면 꽉 차게 표시) -->
+    <div id="imageViewer" class="image-viewer" onclick="closeImage()">
+        <div class="image-container-full">
+            <img id="viewedImage" src="" alt="확대 이미지">
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        // 특수 계정 정의
+        const P_ACCOUNTS = [
+            'fjrtufl9909@gmail.com',
+            'minjune003956@gmail.com',
+            'sexyyousoo68@gmail.com',
+            'seojunna73@gmail.com',
+            'seyun07070782@gmail.com',
+            'chaejun0708@gmail.com',
+            'sonhyeonmins@gmail.com',
+            'rang330579@gmail.com',
+            'seonuh777@gmail.com',
+            'gogumaa0712@gmail.com',
+            'kjuho0716@gmail.com'
+        ];
+        
+        const A_ACCOUNTS = [
+            'shinjonghwan0430@gmail.com',
+            'fofmmm1605@gmail.com'
+        ];
+
+        // 리디렉션 계정
+        const REDIRECT_ACCOUNTS = [
+            'kr.noob12340@gmail.com',
+            'seyun07070782@gmail.com'
+        ];
+
+        // Firebase 구성
+        const firebaseConfig = {
+            apiKey: "AIzaSyClivXSor5P8XJHw1rWYsVfxt8iU6_NgBA",
+            authDomain: "login-34bef.firebaseapp.com",
+            projectId: "login-34bef",
+            storageBucket: "login-34bef.appspot.com",
+            messagingSenderId: "888738257773",
+            appId: "1:888738257773:web:b1c5a99b41996c3ac2d864",
+            measurementId: "G-MJB1NJH05M"
+        };
+
+        // Firebase 초기화
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // DOM 요소
+        const authSection = document.querySelector('.auth-section');
+        const contentSection = document.getElementById('content-section');
+        const logoutBtn = document.getElementById('logout-btn');
+        const guestLoginBtn = document.getElementById('guest-login-btn');
+        const googleLoginBtn = document.getElementById('google-login-btn');
+        const loginMessage = document.getElementById('login-message');
+        const userInfo = document.getElementById('user-info');
+        const userEmail = document.getElementById('user-email');
+
+        // 사용자 상태 변수
+        let currentUser = null;
+        let isGuest = false;
+
+        // Guest 로그인 핸들러
+        guestLoginBtn.addEventListener('click', () => {
+            isGuest = true;
+            currentUser = {
+                email: 'guest@example.com',
+                isGuest: true
+            };
+            updateUI(currentUser);
+        });
+
+        // Google 로그인 핸들러
+        googleLoginBtn.addEventListener('click', async () => {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                currentUser = result.user;
+                isGuest = false;
+                
+                // 리디렉션 계정 확인
+                if (REDIRECT_ACCOUNTS.includes(currentUser.email)) {
+                    window.location.href = 'https://yousoo68.github.io/IHTgAiw/';
+                    return;
+                }
+                
+                updateUI(currentUser);
+            } catch (error) {
+                console.error('Google 로그인 오류:', error);
+            }
+        });
+
+        // 로그아웃 핸들러
+        logoutBtn.addEventListener('click', () => {
+            if (isGuest) {
+                // Guest 로그아웃
+                currentUser = null;
+                isGuest = false;
+                updateUI(null);
+            } else {
+                // Google 계정 로그아웃
+                auth.signOut().then(() => {
+                    currentUser = null;
+                    updateUI(null);
+                }).catch((error) => {
+                    console.error('로그아웃 오류:', error);
+                });
+            }
+        });
+
+        // UI 업데이트 함수
+        function updateUI(user) {
+            if (user || currentUser) {
+                // 로그인 상태
+                authSection.style.display = 'none';
+                contentSection.style.display = 'flex';
+                userInfo.style.display = 'flex';
+                
+                const email = user?.email || currentUser?.email;
+                userEmail.textContent = email;
+            } else {
+                // 로그아웃 상태
+                authSection.style.display = 'flex';
+                contentSection.style.display = 'none';
+                userInfo.style.display = 'none';
+                
+                // 변수 초기화
+                currentUser = null;
+                isGuest = false;
+            }
+        }
+
+        // 인증 상태 리스너
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                isGuest = false;
+                
+                // 리디렉션 계정 확인
+                if (REDIRECT_ACCOUNTS.includes(currentUser.email)) {
+                    window.location.href = 'https://yousoo68.github.io/IHTgAiw/';
+                    return;
+                }
+            }
+            updateUI(user);
+        });
+
+        // 초기 UI 설정
+        updateUI(null);
+
+        // 콘텐츠 관련 함수들
+        // 카테고리 토글 기능
+        function toggleCategory(categoryId) {
+            const category = document.getElementById(categoryId);
+            if (category.style.display === 'block') {
+                category.style.display = 'none';
+            } else {
+                category.style.display = 'block';
+            }
+        }
+
+        // 이미지 뷰어 표시 (전체 화면 꽉 차게)
+        function showImage(imageUrl, hasRedirect = false) {
+            const viewer = document.getElementById('imageViewer');
+            const img = document.getElementById('viewedImage');
+            
+            img.src = imageUrl;
+            viewer.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // 이미지 로드 후 크기 조정
+            img.onload = function() {
+                if (img.naturalHeight > window.innerHeight) {
+                    img.style.width = '100vw';
+                    img.style.height = 'auto';
+                } else {
+                    // 이미지가 화면 높이보다 작으면 세로 중앙 정렬
+                    img.style.width = 'auto';
+                    img.style.height = '100vh';
+                }
+            };
+
+            // 담배 첫경험 썰 하단 클릭 리디렉션
+            if (hasRedirect) {
+                img.onclick = function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const y = e.clientY - rect.top;
+                    
+                    // 이미지 하단 10% 영역 클릭 시 리디렉션
+                    if (y > rect.height * 0.9) {
+                        window.location.href = 'https://youtube.com/shorts/EgPQGvbsKy0';
+                        return false; // 기본 동작 방지
+                    }
+                };
+            }
+        }
+
+        // 이미지 뷰어 닫기 (화면 아무 곳이나 터치)
+        function closeImage() {
+            document.getElementById('imageViewer').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // 이미지 우클릭 방지
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+    </script>
 </body>
 </html>
