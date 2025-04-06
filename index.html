@@ -310,7 +310,7 @@
             color: #999;
             cursor: not-allowed;
             background-color: #f5f5f5;
-            opacity: 0.6; /* 흐리게 처리 */
+            opacity: 0.6;
         }
 
         .subtitle.disabled:hover {
@@ -386,37 +386,37 @@
             font-weight: bold;
         }
 
-        /* 이미지 뷰어 스타일 - 전체 화면 꽉 차게 수정 */
-        .image-viewer {
+        /* 이미지 뷰어 스타일 */
+        #diaryViewer {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            right: 0;
+            bottom: 0;
             background-color: black;
+            background-color: rgba(0, 0, 0, 0.9);
             z-index: 1000;
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
             display: none;
-            touch-action: pan-y;
-        }
-
-        .image-container-full {
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px 0; /* 상하 여백 추가 */
+            overflow-y: auto;
         }
 
-        .image-container-full img {
-            max-width: 100%;
-            max-height: none;
-            width: auto;
-            height: auto;
-            object-fit: contain;
+        #diaryViewer img {
+            width: 100%;
+            object-fit: cover;
+            margin-top: 40px;
+        }
+
+        #diaryViewer button {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1001;
         }
     </style>
 </head>
@@ -472,7 +472,7 @@
             
             <div class="category-button" onclick="toggleCategory('a-limited')">A독자 한정공개 썰</div>
             <div id="a-limited" class="category-content">
-                <div class="subtitle" onclick="showImage('https://i.ibb.co/cKg3Vrdt/DPQHh-Hj-Ts-Q.jpg')"><span class="bold-text">공</span>중화장실에서 <span class="bold-text">섹</span>스한 <span class="bold-text">썰</span>🌿(순한맛)</div>
+                <div class="subtitle" style="color: var(--primary-color);" onclick="showImage('https://i.ibb.co/cKg3Vrdt/DPQHh-Hj-Ts-Q.jpg')"><span class="bold-text">공</span>중화장실에서 <span class="bold-text">섹</span>스한 <span class="bold-text">썰</span>🌿(순한맛)</div>
                 <div class="subtitle" style="color: var(--primary-color);" onclick="showImage('https://i.ibb.co/6JNbncnG/J16-JKu-FTL9.jpg')">중3때 아다 땐 첫경험 썰</div>
             </div>
             
@@ -506,11 +506,10 @@
         <button id="logout-btn" class="logout-btn">로그아웃</button>
     </div>
 
-    <!-- 이미지 뷰어 (전체 화면 꽉 차게 표시) -->
-    <div id="imageViewer" class="image-viewer" onclick="closeImage()">
-        <div class="image-container-full">
-            <img id="viewedImage" src="" alt="확대 이미지">
-        </div>
+    <!-- 이미지 뷰어 -->
+    <div id="diaryViewer" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex-col overflow-y-auto">
+        <button onclick="closeViewer()">✕</button>
+        <img id="viewedDiary" src="" alt="확대 이미지" class="w-full object-cover">
     </div>
 
     <!-- Firebase SDK -->
@@ -519,7 +518,7 @@
 
     <script>
         // 계정 분류 정의
-        const P_READER = [
+        const P_ACCOUNT = [
             'fjrtufl9909@gmail.com',
             'minjune003956@gmail.com',
             'sexyyousoo68@gmail.com',
@@ -532,13 +531,13 @@
             'kjuho0716@gmail.com'
         ];
         
-        const A_READER = [
+        const A_ACCOUNT = [
             'shinjonghwan0430@gmail.com',
             'fofmmm1605@gmail.com',
             'shinyousoo68@gmail.com'
         ];
 
-        const B_READER = [
+        const B_ACCOUNT = [
             'seubuntb@gmail.com'
         ];
 
@@ -573,7 +572,7 @@
         // 사용자 상태 변수
         let currentUser = null;
         let isGuest = false;
-        let userRole = null; // 'P_READER', 'A_READER', 'B_READER' 또는 null
+        let userRole = null; // 'P_ACCOUNT', 'A_ACCOUNT', 'B_ACCOUNT' 또는 null
 
         // Guest 로그인 핸들러
         guestLoginBtn.addEventListener('click', () => {
@@ -584,6 +583,7 @@
             };
             userRole = null;
             updateUI(currentUser);
+            setupContentAccess();
         });
 
         // Google 로그인 핸들러
@@ -595,12 +595,12 @@
                 isGuest = false;
                 
                 // 계정 분류 확인
-                if (P_READER.includes(currentUser.email)) {
-                    userRole = 'P_READER';
-                } else if (A_READER.includes(currentUser.email)) {
-                    userRole = 'A_READER';
-                } else if (B_READER.includes(currentUser.email)) {
-                    userRole = 'B_READER';
+                if (P_ACCOUNT.includes(currentUser.email)) {
+                    userRole = 'P_ACCOUNT';
+                } else if (A_ACCOUNT.includes(currentUser.email)) {
+                    userRole = 'A_ACCOUNT';
+                } else if (B_ACCOUNT.includes(currentUser.email)) {
+                    userRole = 'B_ACCOUNT';
                 } else {
                     // 정의된 계정이 아닌 경우 리디렉션
                     window.location.href = REDIRECT_URL;
@@ -636,6 +636,12 @@
 
         // 콘텐츠 접근 설정 함수
         function setupContentAccess() {
+            // 모든 카테고리 콘텐츠 닫기
+            const categoryContents = document.querySelectorAll('.category-content');
+            categoryContents.forEach(content => {
+                content.style.display = 'none';
+            });
+
             // 모든 카테고리 버튼 활성화
             const categoryButtons = document.querySelectorAll('.category-button');
             categoryButtons.forEach(button => {
@@ -643,14 +649,8 @@
                 button.style.opacity = '1';
             });
 
-            // 모든 카테고리 콘텐츠 펼치기
-            const categoryContents = document.querySelectorAll('.category-content');
-            categoryContents.forEach(content => {
-                content.style.display = 'block';
-            });
-
-            // P_READER: 모든 콘텐츠 활성화
-            if (userRole === 'P_READER') {
+            // P_ACCOUNT: 모든 콘텐츠 활성화
+            if (userRole === 'P_ACCOUNT') {
                 const allSubtitles = document.querySelectorAll('.subtitle');
                 allSubtitles.forEach(subtitle => {
                     subtitle.classList.remove('disabled');
@@ -658,8 +658,8 @@
                 return;
             }
 
-            // A_READER: 특정 콘텐츠만 활성화
-            if (userRole === 'A_READER') {
+            // A_ACCOUNT: 특정 콘텐츠만 활성화
+            if (userRole === 'A_ACCOUNT') {
                 const subtitles = document.querySelectorAll('.subtitle');
                 subtitles.forEach(subtitle => {
                     // '담배 첫경험 썰', '희비가 교차하는 반배정 썰', '우왕좌왕 헬정자의 헬스 썰', '신의 아들임과 동시에 신의 조카가 된 썰'만 활성화
@@ -672,8 +672,8 @@
                 return;
             }
 
-            // B_READER: 특정 콘텐츠만 활성화
-            if (userRole === 'B_READER') {
+            // B_ACCOUNT: 특정 콘텐츠만 활성화
+            if (userRole === 'B_ACCOUNT') {
                 const subtitles = document.querySelectorAll('.subtitle');
                 subtitles.forEach(subtitle => {
                     // '희비가 교차하는 반배정 썰', '우왕좌왕 헬정자의 헬스 썰', '신의 아들임과 동시에 신의 조카가 된 썰'만 활성화
@@ -724,12 +724,12 @@
                 isGuest = false;
                 
                 // 계정 분류 확인
-                if (P_READER.includes(currentUser.email)) {
-                    userRole = 'P_READER';
-                } else if (A_READER.includes(currentUser.email)) {
-                    userRole = 'A_READER';
-                } else if (B_READER.includes(currentUser.email)) {
-                    userRole = 'B_READER';
+                if (P_ACCOUNT.includes(currentUser.email)) {
+                    userRole = 'P_ACCOUNT';
+                } else if (A_ACCOUNT.includes(currentUser.email)) {
+                    userRole = 'A_ACCOUNT';
+                } else if (B_ACCOUNT.includes(currentUser.email)) {
+                    userRole = 'B_ACCOUNT';
                 } else {
                     // 정의된 계정이 아닌 경우 리디렉션
                     window.location.href = REDIRECT_URL;
@@ -757,33 +757,24 @@
             }
         }
 
-        // 이미지 뷰어 표시 (전체 화면 꽉 차게)
+        // 이미지 뷰어 표시
         function showImage(imageUrl, hasRedirect = false) {
-            const viewer = document.getElementById('imageViewer');
-            const img = document.getElementById('viewedImage');
+            const viewer = document.getElementById('diaryViewer');
+            const img = document.getElementById('viewedDiary');
             
             img.src = imageUrl;
-            viewer.style.display = 'block';
+            viewer.style.display = 'flex';
             document.body.style.overflow = 'hidden';
             
-            // 이미지 로드 후 크기 조정
-            img.onload = function() {
-                // 이미지가 화면보다 클 경우 자동으로 스크롤 가능
-                img.style.maxWidth = 'none';
-                img.style.maxHeight = 'none';
-                img.style.width = 'auto';
-                img.style.height = 'auto';
-            };
-
-            // P_READER만 담배 첫경험 썰 하단 클릭 리디렉션 활성화
-            if (hasRedirect && userRole === 'P_READER') {
+            // P_ACCOUNT만 담배 첫경험 썰 하단 클릭 리디렉션 활성화
+            if (hasRedirect && userRole === 'P_ACCOUNT') {
                 img.onclick = function(e) {
                     const rect = this.getBoundingClientRect();
                     const y = e.clientY - rect.top;
                     
                     // 이미지 하단 10% 영역 클릭 시 리디렉션
                     if (y > rect.height * 0.9) {
-                        window.location.href = 'https://youtube.com/shorts/EgPQGvbsKy0';
+                        window.location.href = 'https://youtube.com/watch/EgPQGvbsKy0';
                         return false; // 기본 동작 방지
                     }
                 };
@@ -792,9 +783,9 @@
             }
         }
 
-        // 이미지 뷰어 닫기 (화면 아무 곳이나 터치)
-        function closeImage() {
-            document.getElementById('imageViewer').style.display = 'none';
+        // 이미지 뷰어 닫기
+        function closeViewer() {
+            document.getElementById('diaryViewer').style.display = 'none';
             document.body.style.overflow = 'auto';
         }
 
